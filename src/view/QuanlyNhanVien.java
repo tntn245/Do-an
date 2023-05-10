@@ -4,6 +4,7 @@
  */
 package view;
 
+import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -78,9 +79,9 @@ public class QuanlyNhanVien {
     private JTextField txt_IDNhanVien;
     private JTextField txt_HoTen;
     private JFormattedTextField txt_CCCD;
-//    private JTextField txt_SDT;
     private PrefixTextField txt_SDT;
-    private JTextField txt_GioiTinh;
+//    private JTextField txt_GioiTinh;
+    private JComboBox txt_GioiTinh;
     private JTextField txt_Email;
     private JTextField txt_NgaySinh;
     private JTextField txt_ChucVu;
@@ -282,9 +283,13 @@ public class QuanlyNhanVien {
         });
         txt_SDT.setColumns(10);
 
-        txt_GioiTinh = new JTextField();
+        String StrGioiTinh[] = {"Nam", "Nữ"};
+        txt_GioiTinh = new JComboBox(StrGioiTinh);
+        
         txt_Email = new JTextField();
         txt_NgaySinh = new JTextField();
+//        JDateChooser date = new JDateChooser();
+        
         txt_ChucVu = new JTextField();
         txt_NgayVaoLam = new JTextField();
         txt_Luong = new JFormattedTextField(formatter);
@@ -702,13 +707,15 @@ public class QuanlyNhanVien {
         Object CCCD = txt_CCCD.getValue();
         String DiaChi = txt_DiaChi.getText();
         String SDT = txt_SDT.getText();
-        String GioiTinh = txt_GioiTinh.getText();
+        Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
         String Email = txt_Email.getText();
         String NgSinh = txt_NgaySinh.getText();
         String ChucVu = txt_ChucVu.getText();
         String NVL = txt_NgayVaoLam.getText();
         Object Luong = txt_Luong.getValue();
 
+        //not allow invalid
+        
         try {
             Statement statement = connection.createStatement();
             String sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '"  + SDT + "' , '" + Email + "' , '" + GioiTinh +"' , '" + NgSinh + "' , '" + NVL + "' , '" + ChucVu + "' , '" + Luong + "', '' )";
@@ -794,7 +801,12 @@ public class QuanlyNhanVien {
                 txt_DiaChi.setText(DiaChi);
                 txt_SDT.setText(SDT);
                 txt_Email.setText(Email);
-                txt_GioiTinh.setText(GioiTinh);
+
+                if (GioiTinh == "Nam")
+                    txt_GioiTinh.setSelectedIndex(0);
+                else
+                    txt_GioiTinh.setSelectedIndex(1);
+//                txt_GioiTinh.setText(GioiTinh);
                 txt_NgaySinh.setText(NgSinh);
                 txt_NgayVaoLam.setText(NgVL);
                 txt_ChucVu.setText(ChucVu);
@@ -814,7 +826,7 @@ public class QuanlyNhanVien {
         String DiaChi = txt_DiaChi.getText();
         String SDT = txt_SDT.getText();
         String Email = txt_Email.getText();
-        String GioiTinh = txt_GioiTinh.getText();
+        Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
         String NgSinh = txt_NgaySinh.getText();
         String NgVL = txt_NgayVaoLam.getText();
         String ChucVu = txt_ChucVu.getText();

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -124,8 +125,6 @@ public class MainFrame extends JFrame {
                  
     }
     
-    
-    
     public void QLNV(){
         thanhben.btn_NhanVien.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -135,7 +134,7 @@ public class MainFrame extends JFrame {
     }
 
     public void Choose_Regist(){
-        dangnhap.DangKy.addMouseListener(new MouseListener(){
+        dangnhap.DangKy.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
                 try{
@@ -143,21 +142,10 @@ public class MainFrame extends JFrame {
                     pane_content_DangNhap.setVisible(false);  
                     pane_DangKy.setVisible(true);
                     add(pane_DangKy, BorderLayout.CENTER); // nếu chưa add
-//                    System.out.println("failed");
                 }                 
                 catch (Exception ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
 
             @Override
@@ -182,8 +170,6 @@ public class MainFrame extends JFrame {
             }
         });
     }
-
-
     
     public void Flow() throws IOException, SQLException{
         dangky = new DangKyKH(connection);

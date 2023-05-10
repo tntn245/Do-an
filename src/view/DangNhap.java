@@ -181,7 +181,6 @@ public class DangNhap{
         btn_DangNhap();
         DangKy();
     }
-
     
     //Chen icon
     public JLayeredPane pane_TenTK_Text() throws IOException{
@@ -193,32 +192,20 @@ public class DangNhap{
         TenTK_Text.setFont(new Font("SansSerif", Font.PLAIN, 16));
         Border newBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.black);
         TenTK_Text.setBorder(newBorder);
-//        TenTK_Text.setBorder(BorderFactory.createCompoundBorder(
-//        TenTK_Text.getBorder(), 
-//        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-
         
         JLabel label_icon = new JLabel();
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/Github-Octicons-Person-16.512.png"));
         Image image = icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_DEFAULT);
         ImageIcon newIcon = new ImageIcon(image);   
         label_icon = new JLabel();
-        label_icon.setIcon(newIcon);       
-        
-//        BufferedImage bufferedImage = ImageIO.read(new File("C:\\Users\\My PC\\Downloads\\Picture4.png"));
-//        Image images = bufferedImage.getScaledInstance(17, 17, Image.SCALE_DEFAULT); //SCALE_SMOOTH
-//        ImageIcon i = new ImageIcon(images);
-//        label_icon = new JLabel();
-//        label_icon.setIcon(i);
+        label_icon.setIcon(newIcon);    
         
         TenTK_Text.setBounds(0, 0, 1000, 20);
         label_icon.setBounds(360, -17, 50, 50);
         layer.add(TenTK_Text, new Integer(1));
         layer.add(label_icon, new Integer(2));
         return layer;
-    }
-    
-    
+    }    
 
     public JLayeredPane pane_MatKhau_Text() throws IOException{
         JLayeredPane layer = new JLayeredPane();
@@ -262,16 +249,6 @@ public class DangNhap{
 //        });
         pane_btn_DangNhap.add(btn_DangNhap);
         pane_login.add(pane_btn_DangNhap);
-
-
-//        btn_DangNhap.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//        btn_DangNhap.setFont(new Font("SansSerif", Font.PLAIN, 20));
-//        btn_DangNhap.setBackground(Color.red);
-////        btn_DangNhap.setBorder(new EmptyBorder(10, 10, 10,10));
-//        btn_DangNhap.setBorder(BorderFactory.createCompoundBorder(
-//               BorderFactory.createLineBorder(Color.black, 1),
-//               BorderFactory.createLineBorder(Color.red, 15)));
-//        pane_login.add(btn_DangNhap);
     }
     
     public void DangKy(){
@@ -280,39 +257,13 @@ public class DangNhap{
         DangKy =new JLabel("Bấm vào đây");
         DangKy.setFont(new Font("SansSerif", Font.BOLD, 16));
         DangKy.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//        DangKy.addMouseListener(new MouseListener(){
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                pane_layer.setVisible(false);
-//                pane_login.setVisible(false);    
-//            }
-//
-//            @Override
-//            public void mousePressed(MouseEvent e) {
-//                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-//            }
-//
-//            @Override
-//            public void mouseReleased(MouseEvent e) {
-//                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-//            }
-//
-//            @Override
-//            public void mouseEntered(MouseEvent e) {
-//                DangKy.setForeground(new Color(46,174,255));
-//            }
-//
-//            @Override
-//            public void mouseExited(MouseEvent e) {
-//                DangKy.setForeground(Color.black);
-//            }
-//
-//        });
+        
         JPanel pane_DangKy = new JPanel();
         pane_DangKy.setBackground(Color.white);
         pane_DangKy.setBorder(new EmptyBorder(20, 0, 0,0));
         pane_DangKy.add(Text);
         pane_DangKy.add(DangKy);
+        
         pane_login.add(pane_DangKy);
     }
     

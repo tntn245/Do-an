@@ -54,7 +54,7 @@ public class MainFrame extends JFrame {
     }
     
     public void init() throws IOException, SQLException{
-        this.setTitle("Test");
+        this.setTitle("Nhà hàng Haru");
         this.setSize(900,600);
         this.setLocationRelativeTo(null);
 //        this.setExtendedState(JFrame.MAXIMIZED_BOTH); 

@@ -275,7 +275,7 @@ public class DangNhap{
     }
     
     public void DangKy(){
-        JLabel Text =new JLabel("Đăng ký tài khoản mới ");
+        JLabel Text =new JLabel("Đăng ký tài khoản khách hàng ");
         Text.setFont(new Font("SansSerif", Font.PLAIN, 16));
         DangKy =new JLabel("Bấm vào đây");
         DangKy.setFont(new Font("SansSerif", Font.BOLD, 16));

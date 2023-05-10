@@ -21,6 +21,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
@@ -29,7 +32,8 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
@@ -49,6 +53,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import test.DropShadowJPanel;
 
@@ -73,7 +78,8 @@ public class QuanlyNhanVien {
     private JTextField txt_IDNhanVien;
     private JTextField txt_HoTen;
     private JFormattedTextField txt_CCCD;
-    private JTextField txt_SDT;
+//    private JTextField txt_SDT;
+    private PrefixTextField txt_SDT;
     private JTextField txt_GioiTinh;
     private JTextField txt_Email;
     private JTextField txt_NgaySinh;
@@ -266,7 +272,16 @@ public class QuanlyNhanVien {
         txt_IDNhanVien = new JTextField();
         txt_HoTen = new JTextField();
         txt_CCCD = new JFormattedTextField(formatter);
-        txt_SDT = new JTextField();
+        
+        txt_SDT = new PrefixTextField("0");
+        txt_SDT.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                SDT_keyPressed(e);
+            };
+        });
+        txt_SDT.setColumns(10);
+
         txt_GioiTinh = new JTextField();
         txt_Email = new JTextField();
         txt_NgaySinh = new JTextField();
@@ -290,12 +305,12 @@ public class QuanlyNhanVien {
         themNV_jDialog.getContentPane().add(btn_cancel_themNV, gbc);
         
         JButton btn_XacNhan = new JButton("XÁC NHẬN");
-        btn_XacNhan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_XacNhan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 if(loai)
                     themNV_jButtonActionPerformed(evt);
-//                else 
-//                    suaNV_jButtonActionPerformed(evt);
+                else 
+                    suaNV_jButtonActionPerformed(evt);
             }
         });
         gbc = new GridBagConstraints();
@@ -634,6 +649,24 @@ public class QuanlyNhanVien {
         pane_QLNV.add(Scrollpane_TableNV);
     }
     
+    private void SDT_keyPressed(KeyEvent e) {
+        String PhoneNumber = txt_SDT.getText();
+        int length = PhoneNumber.length();
+        char c = e.getKeyChar();
+        if(e.getKeyChar() >= '0' && e.getKeyChar() <= '9'){
+            if(length < 10)
+                txt_SDT.setEditable(true);
+            else 
+                txt_SDT.setEditable(false);
+        }
+        else {
+            if(e.getExtendedKeyCode()==KeyEvent.VK_BACK_SPACE || e.getExtendedKeyCode()==KeyEvent.VK_DELETE)
+                txt_SDT.setEditable(true);
+            else 
+                txt_SDT.setEditable(false);
+        }
+    }
+    
     private void Exit_Dialog_jButtonActionPerformed(ActionEvent evt) {
         themNV_jDialog.setVisible(false);
     }
@@ -733,10 +766,10 @@ public class QuanlyNhanVien {
                 String HoTen = res.getString("HOTEN");
                 String StrCCCD = res.getString("CCCD");
                 int CCCD;
-                if(StrCCCD != null) 
-                    CCCD = Integer.parseInt(StrCCCD);
-                else 
+                if(StrCCCD == null) 
                     CCCD = 0;
+                else 
+                    CCCD = Integer.parseInt(StrCCCD);
                 String DiaChi = res.getString("DIACHI");
                 String SDT = res.getString("SDT");
                 String Email = res.getString("EMAIL");
@@ -746,10 +779,10 @@ public class QuanlyNhanVien {
                 String ChucVu = res.getString("CHUCVU");
                 String StrLuong = res.getString("LUONG");
                 int Luong;
-                if(StrLuong != null) 
-                    Luong = Integer.parseInt(StrLuong);
-                else 
+                if(StrLuong == null) 
                     Luong = 0;
+                else 
+                    Luong = Integer.parseInt(StrLuong);
                 String MaTK = res.getString("MATK");
 
                 txt_IDNhanVien.setText(MaNV);
@@ -774,7 +807,7 @@ public class QuanlyNhanVien {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private void suaNV_jButtonActionPerformed(){
+    private void suaNV_jButtonActionPerformed(ActionEvent evt){
         String MaNV = txt_IDNhanVien.getText();
         String HoTen = txt_HoTen.getText();
         Object CCCD = txt_CCCD.getValue();

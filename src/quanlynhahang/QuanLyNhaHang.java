@@ -4,6 +4,8 @@
  */
 package quanlynhahang;
 
+import com.formdev.flatlaf.intellijthemes.*;
+import com.formdev.flatlaf.themes.*;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.UIManager;
@@ -29,9 +31,10 @@ public class QuanLyNhaHang {
 //            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
 //            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
 //            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-
+//            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 //            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(new FlatLightFlatIJTheme());
+
             }
         catch (Exception ex) {
             ex.printStackTrace();

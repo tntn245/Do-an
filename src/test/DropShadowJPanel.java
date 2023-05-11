@@ -4,6 +4,7 @@
  */
 package test;
 
+import com.formdev.flatlaf.ui.FlatDropShadowBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -65,17 +66,18 @@ public class DropShadowJPanel extends JPanel {
         pane.setPreferredSize(new Dimension(400, 400));
         
         JPanel p = new JPanel();
-        p.setBackground(Color.gray);
-        p.setBorder(BorderFactory.createCompoundBorder( BorderFactory.createLineBorder(new Color(0,0,0, 50), 10), BorderFactory.createLineBorder(Color.red)));
+//        p.setBackground(Color.gray);
+        p.setBorder(new FlatDropShadowBorder());
+//        p.setBorder(BorderFactory.createCompoundBorder( BorderFactory.createLineBorder(new Color(0,0,0, 50), 10), BorderFactory.createLineBorder(Color.red)));
 //        p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         p.setSize(100, 100);
-//        p.setPreferredSize(new Dimension(100, 100));
+        p.setPreferredSize(new Dimension(500, 500));
         
-        pane.add(p); 
+//        pane.add(p); 
         
         frame.setLayout(new FlowLayout());     
         frame.add(pane);
-//        frame.add(p);
+        frame.add(p);
 
         frame.setSize(800, 800);
         frame.getContentPane().setBackground(new Color(230,241,247) );

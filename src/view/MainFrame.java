@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 import javax.swing.table.DefaultTableModel;
@@ -99,10 +100,11 @@ public class MainFrame extends JFrame {
                     sql = "SELECT * FROM TAIKHOAN";
                     ResultSet res = statement.executeQuery(sql);
                     
+                    boolean flag = false;
                     while(res.next()){
-                        String taikhoan = res.getString("USERNAME");
-                        String matkhau = res.getString("PASSWORD_");
-                        String loai = res.getString("TYPE_");
+                        String taikhoan = res.getString("TENTK");
+                        String matkhau = res.getString("MATKHAU");
+                        String loai = res.getString("LOAI");
                         
                         if(username.equals(taikhoan) && password.equals(matkhau)){
                             System.out.println(loai);
@@ -111,11 +113,16 @@ public class MainFrame extends JFrame {
 //                            add(pane_DangKy, BorderLayout.CENTER);
                             add(thanhben.pane_gradient, BorderLayout.WEST);
                             add(QLNV.pane_QLNV(),BorderLayout.CENTER);
+                            flag=true;
                             break;
                         }                        
                         else {
                             System.out.println("Tai khoan/ Mat khau khong dung.");
                         }
+                    }
+                    if(!flag){
+                        dangnhap.SaiTK_jOptionPane.setVisible(true);
+                        dangnhap.SaiTK_jOptionPane.showMessageDialog(pane_content_DangNhap, "Tên tài khoản/ Mật khẩu không đúng!");
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -161,6 +168,16 @@ public class MainFrame extends JFrame {
         });
     }
     
+    public void Register(){
+        dangky.btn_DangKy.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                pane_DangKy.setVisible(false);
+                pane_background_DangNhap.setVisible(true);
+                pane_content_DangNhap.setVisible(true); 
+            }
+        });
+    }
+    
     public void Return_Login(){
         dangky.btn_TroVe.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -179,6 +196,7 @@ public class MainFrame extends JFrame {
         
         Login();
         Choose_Regist();
+//        Register();
         Return_Login();
         QLNV();
     }

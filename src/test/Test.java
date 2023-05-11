@@ -36,7 +36,7 @@ public class Test extends JFrame {
             }
 
 //            @Override
-//            public void onView(int row) {
+//            public void onCreateAccount(int row) {
 //                System.out.println("View row : " + row);
 //            }
         };

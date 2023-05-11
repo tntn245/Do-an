@@ -33,6 +33,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -68,6 +69,11 @@ public class DangKyKH {
     
     public ButtonGradient btn_DangKy;
     public ButtonGradient btn_TroVe;
+    
+    private JOptionPane TenTK_jOptionPane = new JOptionPane();
+    private JOptionPane ThongtinDK_jOptionPane = new JOptionPane();
+    private JOptionPane SaiMK_jOptionPane = new JOptionPane();
+    private JOptionPane DKthanhcong_jOptionPane = new JOptionPane();
 
     public DangKyKH(Connection connection) throws IOException{
         init();
@@ -359,7 +365,7 @@ public class DangKyKH {
         Nu.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (Nu.isSelected()) {
-                    GioiTinh_DangKy="Nu";
+                    GioiTinh_DangKy="Nữ";
                 }
             }
         });
@@ -373,16 +379,45 @@ public class DangKyKH {
                 String TenTK = TaiKhoan_Text.getText();
                 String MatKhau = MatKhau_Text.getText();
                 String NhapLaiMK = Nhap_Lai_MatKhau_Text.getText();
-                String LoaiTK = "Khach hang";
+                String LoaiTK = "Khách hàng";
 
                 try {
                     Statement statement = connection.createStatement();
-                    String sql = "INSERT INTO TAIKHOAN VALUES (  '' , '" + TenTK + "', '" + MatKhau + "' , '" + LoaiTK + "' )";
-                    int res = statement.executeUpdate(sql);
-                    System.out.println("Insert thanh cong");
-                    sql = "INSERT INTO KHACHHANG VALUES (  '' , '" + HoTen + "', '" + SDT + "' , '" + DiaChi + "' , '" + NgSinh +"' , '" + GioiTinh_DangKy + "', '' )";
-                    res = statement.executeUpdate(sql);
-                    System.out.println("Insert thanh cong");
+                    
+                    if (HoTen.equals("") || SDT.equals("") || DiaChi.equals("") || NgSinh.equals("") || TenTK.equals("") || MatKhau.equals("") || NhapLaiMK.equals("")) {
+                        ThongtinDK_jOptionPane.setVisible(true);
+                        ThongtinDK_jOptionPane.showMessageDialog(pane_layer, "Vui lòng nhập đầy đủ thông tin!");
+                        ThongtinDK_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
+                    }
+                    else{
+                        boolean flag_TK = false;
+                        boolean flag_insertKH = false;
+                        String sql= "SELECT * FROM TAIKHOAN WHERE TENTK = '" +TenTK+"'";
+                        ResultSet res_select = statement.executeQuery(sql);
+                        while(res_select.next())
+                            flag_TK = true;
+                        if(flag_TK){
+                            TenTK_jOptionPane.setVisible(true);
+                            TenTK_jOptionPane.showMessageDialog(pane_layer, "Tên tài khoản đã tồn tại. Mời bạn nhập tên tài khoản khác!");
+                            TenTK_jOptionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+                        }
+                        else if(!MatKhau.equals(NhapLaiMK)){
+                            SaiMK_jOptionPane.setVisible(true);
+                            SaiMK_jOptionPane.showMessageDialog(pane_layer, "Mật khẩu không đúng!");
+                            SaiMK_jOptionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+                        }
+                        else{
+                            sql = "INSERT INTO TAIKHOAN VALUES ( '" + TenTK + "', '" + MatKhau + "' , '" + LoaiTK + "' )";
+                            int res = statement.executeUpdate(sql);
+                            System.out.println("Insert thanh cong");
+                            
+                            sql = "INSERT INTO KHACHHANG VALUES (  '' , '" + HoTen + "', '" +GioiTinh_DangKy+ "' , '" + DiaChi + "' , TO_DATE('"+NgSinh+"', 'DD-MM-YYYY'), '" + SDT + "', '"+ TenTK + "' , 0 )";
+                            res = statement.executeUpdate(sql);
+                            System.out.println("Insert thanh cong");
+                            DKthanhcong_jOptionPane.setVisible(true);
+                            DKthanhcong_jOptionPane.showMessageDialog(pane_layer, "Đăng ký tài khoản thành công!");
+                        }
+                    }
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }

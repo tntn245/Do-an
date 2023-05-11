@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -40,11 +41,13 @@ import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -71,10 +74,12 @@ public class QuanlyNhanVien {
     public JComboBox boxSearch;
     public JTextField txtSearch;
     
-    public JDialog themNV_jDialog;
+    public JDialog formNV_jDialog;
     public JPanel pane_bg_ThemNV;
     public JPanel pane_ThemNV;
-    
+    public JOptionPane themNV_jOptionPane = new JOptionPane();
+    public JOptionPane suaNV_jOptionPane = new JOptionPane();
+    public JOptionPane confirm_xoaNV_jOptionPane = new JOptionPane();
     
     private JTextField txt_IDNhanVien;
     private JTextField txt_HoTen;
@@ -160,20 +165,20 @@ public class QuanlyNhanVien {
         btn_Search.setIcon(newIcon);
         btn_Search.setBackground(Color.white);
         btn_Search.setPreferredSize(new Dimension(40, 35)); 
-        btn_Search.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
+        btn_Search.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
         btn_Search.setContentAreaFilled(false);
         btn_Search.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         pane_search_bar.add(txtSearch);
         pane_search_bar.add(btn_Search);
         
-        String colname_NV[] = { "MANV", "HOTEN", "CCCD", "DIACHI", "SDT", "EMAIL", "GIOITINH", "NGSINH", "NGVL", "CHUCVU", "LUONG", "MATK" };
+        String colname_NV[] = { "MANV", "HOTEN", "CCCD", "DIACHI", "SDT", "EMAIL", "GIOITINH", "NGSINH", "NGVL", "CHUCVU", "LUONG", "TENTK" };
         boxSearch = new JComboBox(colname_NV);
         boxSearch.setSelectedItem("HOTEN");
         boxSearch.setFont(new Font("SansSerif", Font.BOLD, 14));
         boxSearch.setBackground(Color.white);
-        boxSearch.setBorder(null);
-        boxSearch.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        boxSearch.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        boxSearch.setPreferredSize(new Dimension(140, 35)); 
 
         Search();
         
@@ -218,9 +223,9 @@ public class QuanlyNhanVien {
                         String NGVL = res.getString("NGVL");
                         String CHUCVU = res.getString("CHUCVU");
                         Object LUONG = res.getObject("LUONG");
-                        String MATK = res.getString("MATK");
+                        String TENTK = res.getString("TENTK");
 
-                        Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, MATK, null};
+                        Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, TENTK, null};
                         tbmodel.addRow(tbdata);
                     }
                 }
@@ -233,15 +238,15 @@ public class QuanlyNhanVien {
     }
 
     public void init_Dialog(){
-        themNV_jDialog = new JDialog();
-        themNV_jDialog.getContentPane().setBackground(new Color(255, 255, 255));
-        themNV_jDialog.setMinimumSize(new Dimension(700, 500));
-        themNV_jDialog.setModal(true);
-        themNV_jDialog.setResizable(false);
+        formNV_jDialog = new JDialog();
+        formNV_jDialog.getContentPane().setBackground(new Color(255, 255, 255));
+        formNV_jDialog.setMinimumSize(new Dimension(700, 500));
+        formNV_jDialog.setModal(true);
+        formNV_jDialog.setResizable(false);
         GridBagLayout jDialogLayout = new GridBagLayout();
         jDialogLayout.columnWidths = new int[] {0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0, 10, 0};
         jDialogLayout.rowHeights = new int[] {0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0};
-        themNV_jDialog.getContentPane().setLayout(jDialogLayout);
+        formNV_jDialog.getContentPane().setLayout(jDialogLayout);
     }
     
     public void Dialog_form( boolean loaiDialog, int row){
@@ -307,7 +312,7 @@ public class QuanlyNhanVien {
         gbc.gridy = 18;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(btn_cancel_themNV, gbc);
+        formNV_jDialog.getContentPane().add(btn_cancel_themNV, gbc);
         
         JButton btn_XacNhan = new JButton("XÁC NHẬN");
         btn_XacNhan.addActionListener(new ActionListener() {
@@ -323,99 +328,97 @@ public class QuanlyNhanVien {
         gbc.gridy = 18;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(btn_XacNhan, gbc);
+        formNV_jDialog.getContentPane().add(btn_XacNhan, gbc);
         
-        if(!loai)
-            setText_suaNV_Dialog(row);
         
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(IDNhanVien, gbc);
+        formNV_jDialog.getContentPane().add(IDNhanVien, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 56;
         gbc.gridy = 0;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(HoTen, gbc);
+        formNV_jDialog.getContentPane().add(HoTen, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
         gbc.gridy = 0;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(CCCD, gbc);
+        formNV_jDialog.getContentPane().add(CCCD, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(SDT, gbc);
+        formNV_jDialog.getContentPane().add(SDT, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
         gbc.gridy = 4;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(GioiTinh, gbc);
+        formNV_jDialog.getContentPane().add(GioiTinh, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 56;
         gbc.gridy = 4;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(Email, gbc);
+        formNV_jDialog.getContentPane().add(Email, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(NgaySinh, gbc);
+        formNV_jDialog.getContentPane().add(NgaySinh, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 56;
         gbc.gridy = 8;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(ChucVu, gbc);
+        formNV_jDialog.getContentPane().add(ChucVu, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
         gbc.gridy = 8;
         gbc.gridwidth = 5;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(NgayVaoLam, gbc);
+        formNV_jDialog.getContentPane().add(NgayVaoLam, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 12;
         gbc.gridwidth = 5;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(Luong, gbc);
+        formNV_jDialog.getContentPane().add(Luong, gbc);
 
         gbc = new java.awt.GridBagConstraints();
         gbc.gridx = 26;
         gbc.gridy = 12;
         gbc.gridwidth = 5;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        themNV_jDialog.getContentPane().add(DiaChi, gbc);
+        formNV_jDialog.getContentPane().add(DiaChi, gbc);
         
         if(loai)
             setText_nextMANV();
-//        else
-//            setText_currMANV();
+        else
+            setText_currMANV(row);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 23;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_IDNhanVien, gbc);
+        formNV_jDialog.getContentPane().add(txt_IDNhanVien, gbc);
 
         txt_HoTen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -428,7 +431,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 19;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_HoTen, gbc);
+        formNV_jDialog.getContentPane().add(txt_HoTen, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
@@ -436,7 +439,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 25;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_CCCD, gbc);
+        formNV_jDialog.getContentPane().add(txt_CCCD, gbc);
         
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -444,7 +447,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 23;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_SDT, gbc);
+        formNV_jDialog.getContentPane().add(txt_SDT, gbc);
         
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
@@ -452,7 +455,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 25;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_GioiTinh, gbc);
+        formNV_jDialog.getContentPane().add(txt_GioiTinh, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 56;
@@ -460,7 +463,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 19;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_Email, gbc);
+        formNV_jDialog.getContentPane().add(txt_Email, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -468,7 +471,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 23;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_NgaySinh, gbc);
+        formNV_jDialog.getContentPane().add(txt_NgaySinh, gbc);
 
         txt_ChucVu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -482,7 +485,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 19;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_ChucVu, gbc);
+        formNV_jDialog.getContentPane().add(txt_ChucVu, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
@@ -490,7 +493,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 25;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_NgayVaoLam, gbc);
+        formNV_jDialog.getContentPane().add(txt_NgayVaoLam, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -498,7 +501,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 23;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_Luong, gbc);
+        formNV_jDialog.getContentPane().add(txt_Luong, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
@@ -506,7 +509,7 @@ public class QuanlyNhanVien {
         gbc.gridwidth = 49;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        themNV_jDialog.getContentPane().add(txt_DiaChi, gbc);    
+        formNV_jDialog.getContentPane().add(txt_DiaChi, gbc);    
     }
 
     public void btn_ThemNV(){
@@ -562,21 +565,25 @@ public class QuanlyNhanVien {
         
         table_NV.getTableHeader().setOpaque(false);
         table_NV.getTableHeader().setBackground(new Color(167,222,254));
+        table_NV.getTableHeader().setForeground(Color.black);
         table_NV.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+//        table_NV.getTableHeader().setFont(new Font(table_NV.getFont().getName(),Font.BOLD,14));
+        table_NV.getTableHeader().setPreferredSize(new Dimension(table_NV.getWidth(),40));
+        
         table_NV.setShowHorizontalLines(false);
+        table_NV.setGridColor(Color.white);
         table_NV.setBorder(new EmptyBorder(5, 5, 5,5));
         table_NV.setFont(new Font("SansSerif", Font.PLAIN, 14));
-//                new Font(table_NV.getFont().getName(),Font.BOLD,table_NV.getFont().getSize()));
-        table_NV.setGridColor(Color.white);
+//        table_NV.setFont(new Font(table_NV.getFont().getName(),Font.PLAIN,14));
         
         TableColumnModel columnModel = table_NV.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(100);
-        columnModel.getColumn(1).setPreferredWidth(100);
-        columnModel.getColumn(2).setPreferredWidth(50);
+        columnModel.getColumn(1).setPreferredWidth(150);
+        columnModel.getColumn(2).setPreferredWidth(100);
         columnModel.getColumn(3).setPreferredWidth(100);
         columnModel.getColumn(4).setPreferredWidth(100);
         columnModel.getColumn(5).setPreferredWidth(100);
-        columnModel.getColumn(6).setPreferredWidth(50);
+        columnModel.getColumn(6).setPreferredWidth(100);
 //        columnModel.getColumn(7).setPreferredWidth(100);
         try{
             String sql= "select * from NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
@@ -590,9 +597,9 @@ public class QuanlyNhanVien {
                 String NGVL = res.getString("NGVL");
                 String CHUCVU = res.getString("CHUCVU");
                 Object LUONG = res.getObject("LUONG");
-                String MATK = res.getString("MATK");
+                String TENTK = res.getString("TENTK");
 
-                Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, MATK, null};
+                Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, TENTK, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_NV.getModel();
                 tbmodel.addRow(tbdata);
             }
@@ -626,14 +633,14 @@ public class QuanlyNhanVien {
                 DefaultTableModel model = (DefaultTableModel) table_NV.getModel();
                 Object value_MANV = model.getValueAt(row, 0);
                 System.out.println(value_MANV);
-                Object value_MATK = model.getValueAt(row, 0);
-                System.out.println(value_MATK);
+                Object value_TENTK = model.getValueAt(row, 0);
+                System.out.println(value_TENTK);
                 try {
                     Statement statement = connection.createStatement();
                     String sql = "DELETE FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
                     int res = statement.executeUpdate(sql);
                     System.out.println("Delete NV thanh cong");
-                    sql = "DELETE FROM TAIKHOAN WHERE MATK = '" + value_MATK + "'";
+                    sql = "DELETE FROM TAIKHOAN WHERE TENTK = '" + value_TENTK + "'";
                     res = statement.executeUpdate(sql);
                     System.out.println("Delete TK thanh cong");
                     model.removeRow(row);
@@ -641,6 +648,8 @@ public class QuanlyNhanVien {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+//            @Override
+//            public void onCreateAccount(int row) {}
         };
         table_NV.getColumnModel().getColumn(7).setCellRenderer(new TableActionCellRender());
         table_NV.getColumnModel().getColumn(7).setCellEditor(new TableActionCellEditor(event));
@@ -673,14 +682,14 @@ public class QuanlyNhanVien {
     }
     
     private void Exit_Dialog_jButtonActionPerformed(ActionEvent evt) {
-        themNV_jDialog.setVisible(false);
+        formNV_jDialog.setVisible(false);
     }
 
     private void ThemNhanVien_Dialog(ActionEvent evt) {
         Dialog_form(true, -1);
-        themNV_jDialog.pack();
-        themNV_jDialog.setLocationRelativeTo(null);
-        themNV_jDialog.setVisible(true);
+        formNV_jDialog.pack();
+        formNV_jDialog.setLocationRelativeTo(null);
+        formNV_jDialog.setVisible(true);
     }
     private void setText_nextMANV(){
         String MANV;
@@ -713,7 +722,7 @@ public class QuanlyNhanVien {
         String ChucVu = txt_ChucVu.getText();
         String NVL = txt_NgayVaoLam.getText();
         Object Luong = txt_Luong.getValue();
-
+        
         //not allow invalid
         
         try {
@@ -721,7 +730,9 @@ public class QuanlyNhanVien {
             String sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '"  + SDT + "' , '" + Email + "' , '" + GioiTinh +"' , '" + NgSinh + "' , '" + NVL + "' , '" + ChucVu + "' , '" + Luong + "', '' )";
             int res = statement.executeUpdate(sql);
             System.out.println("Insert thanh cong");
-            themNV_jDialog.setVisible(false);
+            themNV_jOptionPane.setVisible(true);
+            themNV_jOptionPane.showMessageDialog(formNV_jDialog, "Thêm thành công nhân viên!");
+            formNV_jDialog.setVisible(false);
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -738,10 +749,10 @@ public class QuanlyNhanVien {
                 NVL = res.getString("NGVL");
                 ChucVu = res.getString("CHUCVU");
                 Luong = res.getObject("LUONG");
-                String MaTK = res.getString("MATK");
+                String TENTK = res.getString("TENTK");
 
                 
-                Object tbdata[] = {MaNV, HoTen, GioiTinh, NVL, ChucVu, Luong, MaTK, null};
+                Object tbdata[] = {MaNV, HoTen, GioiTinh, NVL, ChucVu, Luong, TENTK, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_NV.getModel();
                 tbmodel.addRow(tbdata);
                 break;
@@ -754,11 +765,11 @@ public class QuanlyNhanVien {
 
     private void SuaNhanVien_Dialog(int row) {
         Dialog_form(false, row);
-        themNV_jDialog.pack();
-        themNV_jDialog.setLocationRelativeTo(null);
-        themNV_jDialog.setVisible(true);
+        formNV_jDialog.pack();
+        formNV_jDialog.setLocationRelativeTo(null);
+        formNV_jDialog.setVisible(true);
     }
-    private void setText_suaNV_Dialog(int row){
+    private void setText_currMANV(int row){
         DefaultTableModel model = (DefaultTableModel) table_NV.getModel();
         Object value_MANV = model.getValueAt(row, 0);
         System.out.println(value_MANV);
@@ -778,7 +789,7 @@ public class QuanlyNhanVien {
                 else 
                     CCCD = Integer.parseInt(StrCCCD);
                 String DiaChi = res.getString("DIACHI");
-                String SDT = res.getString("SDT");
+                String SDT = res.getString("SDT").substring(1);
                 String Email = res.getString("EMAIL");
                 String GioiTinh = res.getString("GIOITINH");
                 String NgSinh = res.getString("NGSINH");
@@ -790,7 +801,7 @@ public class QuanlyNhanVien {
                     Luong = 0;
                 else 
                     Luong = Integer.parseInt(StrLuong);
-                String MaTK = res.getString("MATK");
+                String TENTK = res.getString("TENTK");
 
                 txt_IDNhanVien.setText(MaNV);
                 txt_IDNhanVien.setForeground(new Color(134, 134, 134));
@@ -806,12 +817,10 @@ public class QuanlyNhanVien {
                     txt_GioiTinh.setSelectedIndex(0);
                 else
                     txt_GioiTinh.setSelectedIndex(1);
-//                txt_GioiTinh.setText(GioiTinh);
                 txt_NgaySinh.setText(NgSinh);
                 txt_NgayVaoLam.setText(NgVL);
                 txt_ChucVu.setText(ChucVu);
                 txt_Luong.setValue(Luong);
-//                        txt_MaTK.
             }
 
             System.out.println("Update NV thanh cong");
@@ -833,13 +842,35 @@ public class QuanlyNhanVien {
         Object Luong = txt_Luong.getValue();
         try {
             Statement statement = connection.createStatement();
-            String sql = "UPDATE FROM NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = '"+NgSinh+"', NGVL = '"+NgVL+"', CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", MATK = '' WHERE MANV = '" + MaNV + "'";
+            String sql = "UPDATE NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = '"+NgSinh+"', NGVL = '"+NgVL+"', CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", TENTK = '' WHERE MANV = '" + MaNV + "'";
             int res = statement.executeUpdate(sql);
-            
+            suaNV_jOptionPane.setVisible(true);
+            suaNV_jOptionPane.showMessageDialog(formNV_jDialog, "Cập nhật nhân viên thành công!");
+            formNV_jDialog.setVisible(false);
             System.out.println("Update TK thanh cong");
 //            model.removeRow(row);
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+//    public void uploadimg(ActionEvent e) {
+//        JFileChooser chooser = new JFileChooser();
+//        chooser.showOpenDialog(null);
+//        File f = chooser.getSelectedFile();
+//        String filename = f.getAbsolutePath();
+//        txt_HoTen.setText(filename);
+//        try {
+//            ImageIcon ii = new ImageIcon(ImageIO.read(new File(f.getAbsolutePath())));//get the image from file chooser and scale it to match JLabel size
+////        jLabel1.setIcon(ii);
+//            Image image = ii.getImage().getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
+//            ImageIcon newIcon = new ImageIcon(image);
+//            JLabel j = new JLabel();
+//            j.setIcon(newIcon);
+////        IDNhanVien.setIcon(newIcon);
+//            formNV_jDialog.add(j);
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//    }
 }

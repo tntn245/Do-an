@@ -40,6 +40,9 @@ public class DangNhap{
     public ButtonGradient btn_DangNhap;
     public JLabel DangKy;
     
+    public JOptionPane SaiTK_jOptionPane = new JOptionPane();
+
+    
     public DangNhap() throws IOException{
         init();
     }

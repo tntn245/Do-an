@@ -36,6 +36,12 @@ public class PanelAction extends JPanel {
                 event.onDelete(row);
             }
         });
+//        cmdCreateAccount.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent ae) {
+//                event.onDelete(row);
+//            }
+//        });
     }
 
     /**
@@ -49,6 +55,8 @@ public class PanelAction extends JPanel {
         cmdEdit = new ActionButton();
         cmdDelete = new ActionButton();
 
+//        cmdEdit.setText("Sửa");
+//        cmdDelete.setText("Xóa");
         cmdEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/edit.png"))); // NOI18N
         cmdDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/delete.png"))); // NOI18N
 
@@ -80,5 +88,6 @@ public class PanelAction extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ActionButton cmdDelete;
     private ActionButton cmdEdit;
+//    private ActionButton cmdCreateAccount;
     // End of variables declaration//GEN-END:variables
 }

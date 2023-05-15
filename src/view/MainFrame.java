@@ -47,7 +47,15 @@ public class MainFrame extends JFrame {
     private JLayeredPane pane_DangKy;
     
     private ThanhBen thanhben;
+    
+    private TrangChuQL trangchuQL;
+    JLayeredPane pane_TrangChuQL;
+    
     private QuanlyNhanVien QLNV;
+    JPanel pane_QLNV;
+    
+    private QuanlyKho QLKho;
+    JPanel pane_QLKho;
 
     public MainFrame() throws IOException, SQLException{
         init();        
@@ -73,8 +81,17 @@ public class MainFrame extends JFrame {
         dangnhap = new DangNhap();
         pane_background_DangNhap = dangnhap.pane_background();
         pane_content_DangNhap = dangnhap.pane_login();
+        
+        trangchuQL = new TrangChuQL();
+        pane_TrangChuQL = trangchuQL.pane_layer;
+        
         thanhben = new ThanhBen();
+        
         QLNV = new QuanlyNhanVien(connection);
+        pane_QLNV = QLNV.pane_QLNV();
+        
+        QLKho = new QuanlyKho(connection);
+        pane_QLKho = QLKho.pane_QLKho();
     }
     
     public void ConnectDB() throws SQLException{
@@ -96,6 +113,14 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e){
                 String username = dangnhap.TenTK_Text.getText();
                 String password = dangnhap.MatKhau_Text.getText();
+                
+                if (username.equals("") || password.equals("")){
+                    dangnhap.ThieuThongTin_jOptionPane.setVisible(true);
+                    dangnhap.ThieuThongTin_jOptionPane.showMessageDialog(pane_content_DangNhap, "Vui lòng nhập đầy đủ thông tin!");
+                    dangnhap.ThieuThongTin_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
                 try {
                     sql = "SELECT * FROM TAIKHOAN";
                     ResultSet res = statement.executeQuery(sql);
@@ -110,9 +135,8 @@ public class MainFrame extends JFrame {
                             System.out.println(loai);
                             pane_background_DangNhap.setVisible(false);
                             pane_content_DangNhap.setVisible(false);  
-//                            add(pane_DangKy, BorderLayout.CENTER);
                             add(thanhben.pane_gradient, BorderLayout.WEST);
-                            add(QLNV.pane_QLNV(),BorderLayout.CENTER);
+                            add(pane_TrangChuQL,BorderLayout.CENTER);
                             flag=true;
                             break;
                         }                        
@@ -136,10 +160,33 @@ public class MainFrame extends JFrame {
         thanhben.btn_NhanVien.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 System.out.println("Da bam QLNV");
+                if(pane_TrangChuQL.isDisplayable())
+                    pane_TrangChuQL.setVisible(false);
+                if(pane_QLKho.isDisplayable()){
+                    pane_QLKho.setVisible(false);
+                    pane_QLNV.setVisible(true);
+                }
+                add(pane_QLNV,BorderLayout.CENTER);
             }
         });
     }
 
+    public void QLKho(){
+        thanhben.btn_Kho.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam QLKho");
+                if(pane_TrangChuQL.isDisplayable())
+                    pane_TrangChuQL.setVisible(false);
+                if(pane_QLNV.isDisplayable()){
+                    pane_QLNV.setVisible(false);
+                    pane_QLKho.setVisible(true);
+                }
+                add(pane_QLKho,BorderLayout.CENTER);
+            }
+        });
+    }    
+    
+    
     public void Choose_Regist(){
         dangnhap.DangKy.addMouseListener(new MouseAdapter(){
             @Override
@@ -199,6 +246,7 @@ public class MainFrame extends JFrame {
 //        Register();
         Return_Login();
         QLNV();
+        QLKho();
     }
 }
 

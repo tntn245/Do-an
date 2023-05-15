@@ -4,6 +4,7 @@
  */
 package view;
 
+import com.raven.datechooser.*;
 import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
 import java.awt.Component;
@@ -55,6 +56,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultFormatterFactory;
@@ -83,9 +85,8 @@ public class QuanlyNhanVien {
     
     private JTextField txt_IDNhanVien;
     private JTextField txt_HoTen;
-    private JFormattedTextField txt_CCCD;
+    private JTextField txt_CCCD;
     private PrefixTextField txt_SDT;
-//    private JTextField txt_GioiTinh;
     private JComboBox txt_GioiTinh;
     private JTextField txt_Email;
     private JTextField txt_NgaySinh;
@@ -94,6 +95,10 @@ public class QuanlyNhanVien {
     private JFormattedTextField txt_Luong;
     private JTextField txt_DiaChi;
 
+    private JOptionPane ThieuThongTin_jOptionPane = new JOptionPane();
+    private JOptionPane CCCDTontai_jOptionPane = new JOptionPane();
+    private JOptionPane Delete_Confirm_jOptionPane = new JOptionPane();
+    
     private Connection connection;
     
     public QuanlyNhanVien(Connection connection){
@@ -138,15 +143,13 @@ public class QuanlyNhanVien {
     public void pane_search(){
         JPanel pane_search_bar = new JPanel();
         pane_search_bar.setBackground(Color.white );
-        pane_search_bar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
+        pane_search_bar.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         
         txtSearch = new JTextField(" Search");
-        txtSearch.setPreferredSize(new Dimension(50, 35)); 
+        txtSearch.setPreferredSize(new Dimension(50, 31)); 
         txtSearch.setColumns(35);     
         txtSearch.setForeground(Color.GRAY);
         txtSearch.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        Border newBorder = BorderFactory.createMatteBorder(1, 1, 1, 0, Color.black);
-        txtSearch.setBorder(newBorder);
         txtSearch.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 txtSearch.setText("");
@@ -159,14 +162,12 @@ public class QuanlyNhanVien {
         });
         
         btn_Search = new JButton();
-        ImageIcon icon = new ImageIcon(getClass().getResource("/image/magnifier.png"));
-        Image image = icon.getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(getClass().getResource("/image/search1.png"));
+        Image image = icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(image); 
         btn_Search.setIcon(newIcon);
         btn_Search.setBackground(Color.white);
-        btn_Search.setPreferredSize(new Dimension(40, 35)); 
-        btn_Search.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
-        btn_Search.setContentAreaFilled(false);
+        btn_Search.setPreferredSize(new Dimension(40, 31)); 
         btn_Search.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         pane_search_bar.add(txtSearch);
@@ -177,13 +178,17 @@ public class QuanlyNhanVien {
         boxSearch.setSelectedItem("HOTEN");
         boxSearch.setFont(new Font("SansSerif", Font.BOLD, 14));
         boxSearch.setBackground(Color.white);
-        boxSearch.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
-        boxSearch.setPreferredSize(new Dimension(140, 35)); 
+        boxSearch.setPreferredSize(new Dimension(135, 35)); 
 
         Search();
         
+        pane_search_bar.setBorder(txtSearch.getBorder());
+        txtSearch.setBorder(null);
+        btn_Search.setBorder(null);
+        
         pane_Search.add(pane_search_bar);
         pane_Search.add(boxSearch);
+        pane_Search.setBorder(new EmptyBorder(10, 0, 0, 0));
     }
     
     public void pane_ThemNV(){
@@ -209,7 +214,12 @@ public class QuanlyNhanVien {
             public void actionPerformed(ActionEvent e){
                 System.out.println("Da bam tim kiem NV");
                 try{
-                    String sql= "select * from NHANVIEN where " + boxSearch.getSelectedItem().toString() + " = '" + txtSearch.getText() + "'";
+                    String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
+                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
+                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
+                    + "CHUCVU, LUONG, TENTK "
+                    + "FROM NHANVIEN WHERE "
+                    + boxSearch.getSelectedItem().toString() + " LIKE '%" + txtSearch.getText() + "%'";
                     Statement statement = connection.createStatement();
                     ResultSet res = statement.executeQuery(sql);
                     
@@ -277,26 +287,35 @@ public class QuanlyNhanVien {
         
         txt_IDNhanVien = new JTextField();
         txt_HoTen = new JTextField();
-        txt_CCCD = new JFormattedTextField(formatter);
+        
+        txt_CCCD = new JTextField();
+        txt_CCCD.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                Number_keyPressed(e, txt_CCCD, 12);
+            };
+        });
         
         txt_SDT = new PrefixTextField("0");
         txt_SDT.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                SDT_keyPressed(e);
+                Number_keyPressed(e, txt_SDT, 10);
             };
         });
-        txt_SDT.setColumns(10);
 
         String StrGioiTinh[] = {"Nam", "Nữ"};
         txt_GioiTinh = new JComboBox(StrGioiTinh);
-        
         txt_Email = new JTextField();
         txt_NgaySinh = new JTextField();
-//        JDateChooser date = new JDateChooser();
-        
+        DateChooser ngaySinh_dateChooser = new DateChooser();
+        ngaySinh_dateChooser.setForeground(new java.awt.Color(167, 223, 255));
+        ngaySinh_dateChooser.setTextRefernce(txt_NgaySinh);
         txt_ChucVu = new JTextField();
         txt_NgayVaoLam = new JTextField();
+        DateChooser ngayVaoLam_dateChooser = new DateChooser();
+        ngayVaoLam_dateChooser.setForeground(new java.awt.Color(255, 184, 183));
+        ngayVaoLam_dateChooser.setTextRefernce(txt_NgayVaoLam);
         txt_Luong = new JFormattedTextField(formatter);
         txt_DiaChi = new JTextField();
         
@@ -320,7 +339,7 @@ public class QuanlyNhanVien {
                 if(loai)
                     themNV_jButtonActionPerformed(evt);
                 else 
-                    suaNV_jButtonActionPerformed(evt);
+                    suaNV_jButtonActionPerformed(evt, row);
             }
         });
         gbc = new GridBagConstraints();
@@ -517,7 +536,6 @@ public class QuanlyNhanVien {
         btn_ThemNV.setText("THÊM MỚI");
         btn_ThemNV.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn_ThemNV.setFont(new Font(btn_ThemNV.getFont().getName(),Font.BOLD,btn_ThemNV.getFont().getSize()));
-//                new Font("SansSerif", Font.BOLD, 14));
         
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/add-employee-icon.png"));
         Image image = icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH);
@@ -539,7 +557,7 @@ public class QuanlyNhanVien {
     public void table_NV(){
         Scrollpane_TableNV= new JScrollPane();
 
-        String[] columnNames = {"Mã NV", "Họ tên", "Giới tính", "Ngày vào làm", "Chức vụ", "Lương", "Mã TK", ""};
+        String[] columnNames = {"Mã NV", "Họ tên", "Giới tính", "Ngày vào làm", "Chức vụ", "Lương", "Tên TK", ""};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, true
@@ -569,9 +587,11 @@ public class QuanlyNhanVien {
         table_NV.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
 //        table_NV.getTableHeader().setFont(new Font(table_NV.getFont().getName(),Font.BOLD,14));
         table_NV.getTableHeader().setPreferredSize(new Dimension(table_NV.getWidth(),40));
-        
+        table_NV.getTableHeader().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.black));
+                
         table_NV.setShowHorizontalLines(false);
         table_NV.setGridColor(Color.white);
+        table_NV.setBackground(Color.white);
         table_NV.setBorder(new EmptyBorder(5, 5, 5,5));
         table_NV.setFont(new Font("SansSerif", Font.PLAIN, 14));
 //        table_NV.setFont(new Font(table_NV.getFont().getName(),Font.PLAIN,14));
@@ -586,7 +606,11 @@ public class QuanlyNhanVien {
         columnModel.getColumn(6).setPreferredWidth(100);
 //        columnModel.getColumn(7).setPreferredWidth(100);
         try{
-            String sql= "select * from NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
+            String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
+                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
+                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
+                    + "CHUCVU, LUONG, TENTK "
+                    + "FROM NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
 
@@ -616,13 +640,7 @@ public class QuanlyNhanVien {
             @Override
             public void onEdit(int row) {
                 System.out.println("Edit row : " + row);
-                
                 SuaNhanVien_Dialog(row);
-                
-//                if(table_NV.isEditing()) {
-//                    table_NV.getCellEditor().stopCellEditing();
-//                }
-                
             }
 
             @Override
@@ -637,13 +655,17 @@ public class QuanlyNhanVien {
                 System.out.println(value_TENTK);
                 try {
                     Statement statement = connection.createStatement();
-                    String sql = "DELETE FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
-                    int res = statement.executeUpdate(sql);
-                    System.out.println("Delete NV thanh cong");
-                    sql = "DELETE FROM TAIKHOAN WHERE TENTK = '" + value_TENTK + "'";
-                    res = statement.executeUpdate(sql);
-                    System.out.println("Delete TK thanh cong");
-                    model.removeRow(row);
+                    Delete_Confirm_jOptionPane.setVisible(true);
+                    int flag_OK = Delete_Confirm_jOptionPane.showConfirmDialog(formNV_jDialog, "Bạn chắc chắn muốn xóa nhân viên?",null, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if(flag_OK == JOptionPane.OK_OPTION){
+                        String sql = "DELETE FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
+                        int res = statement.executeUpdate(sql);
+                        System.out.println("Delete NV thanh cong");
+                        sql = "DELETE FROM TAIKHOAN WHERE TENTK = '" + value_TENTK + "'";
+                        res = statement.executeUpdate(sql);
+                        System.out.println("Delete TK thanh cong");
+                        model.removeRow(row);
+                    }
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -656,28 +678,26 @@ public class QuanlyNhanVien {
         
         
         Scrollpane_TableNV.setViewportView(table_NV);
-        Scrollpane_TableNV.setBorder(new EmptyBorder(0, 0, 0,0));
+        Scrollpane_TableNV.setBorder(new LineBorder( Color.LIGHT_GRAY, 1, true));
         Scrollpane_TableNV.setPreferredSize(new Dimension(700, 450));
-//        Scrollpane_TableNV.getColumnHeader().setBackground(new Color(167,222,254));
-//        Scrollpane_TableNV.setMaximumSize(Scrollpane_TableNV.getPreferredSize());
         pane_QLNV.add(Scrollpane_TableNV);
     }
     
-    private void SDT_keyPressed(KeyEvent e) {
-        String PhoneNumber = txt_SDT.getText();
+    private void Number_keyPressed(KeyEvent e, JTextField txt, int len) {
+        String PhoneNumber = txt.getText();
         int length = PhoneNumber.length();
         char c = e.getKeyChar();
         if(e.getKeyChar() >= '0' && e.getKeyChar() <= '9'){
-            if(length < 10)
-                txt_SDT.setEditable(true);
+            if(length < len)
+                txt.setEditable(true);
             else 
-                txt_SDT.setEditable(false);
+                txt.setEditable(false);
         }
         else {
             if(e.getExtendedKeyCode()==KeyEvent.VK_BACK_SPACE || e.getExtendedKeyCode()==KeyEvent.VK_DELETE)
-                txt_SDT.setEditable(true);
+                txt.setEditable(true);
             else 
-                txt_SDT.setEditable(false);
+                txt.setEditable(false);
         }
     }
     
@@ -713,7 +733,7 @@ public class QuanlyNhanVien {
     private void themNV_jButtonActionPerformed(ActionEvent evt){
         String MaNV = txt_IDNhanVien.getText();            
         String HoTen = txt_HoTen.getText();
-        Object CCCD = txt_CCCD.getValue();
+        String CCCD = txt_CCCD.getText();
         String DiaChi = txt_DiaChi.getText();
         String SDT = txt_SDT.getText();
         Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
@@ -723,16 +743,34 @@ public class QuanlyNhanVien {
         String NVL = txt_NgayVaoLam.getText();
         Object Luong = txt_Luong.getValue();
         
-        //not allow invalid
-        
+
+                    
         try {
             Statement statement = connection.createStatement();
-            String sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '"  + SDT + "' , '" + Email + "' , '" + GioiTinh +"' , '" + NgSinh + "' , '" + NVL + "' , '" + ChucVu + "' , '" + Luong + "', '' )";
-            int res = statement.executeUpdate(sql);
-            System.out.println("Insert thanh cong");
-            themNV_jOptionPane.setVisible(true);
-            themNV_jOptionPane.showMessageDialog(formNV_jDialog, "Thêm thành công nhân viên!");
-            formNV_jDialog.setVisible(false);
+            if (HoTen.equals("") || CCCD.equals("") || DiaChi.equals("") || SDT.equals("") || GioiTinh.equals("") || Email.equals("") || NgSinh.equals("") || ChucVu.equals("") || NVL.equals("") || Luong.equals("")) {
+                ThieuThongTin_jOptionPane.setVisible(true);
+                ThieuThongTin_jOptionPane.showMessageDialog(formNV_jDialog, "Vui lòng nhập đầy đủ thông tin!");
+                ThieuThongTin_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
+            } else {
+                boolean flag_CCCDtontai = false;
+                String sql = "SELECT * FROM NHANVIEN WHERE CCCD = '" + CCCD + "'";
+                ResultSet res_select = statement.executeQuery(sql);
+                while (res_select.next()) {
+                    flag_CCCDtontai = true;
+                }
+                if (flag_CCCDtontai) {
+                    CCCDTontai_jOptionPane.setVisible(true);
+                    CCCDTontai_jOptionPane.showMessageDialog(formNV_jDialog, "CMND/CCCD đã tồn tại!");
+                    CCCDTontai_jOptionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+                } else {
+                    sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '" + SDT + "' , '" + Email + "' , '" + GioiTinh + "' , TO_DATE('" + NgSinh + "', 'DD-MM-YYYY'), TO_DATE('" + NVL + "', 'DD-MM-YYYY'), '" + ChucVu + "' , '" + Luong + "', '' )";
+                    int res = statement.executeUpdate(sql);
+                    System.out.println("Insert thanh cong");
+                    themNV_jOptionPane.setVisible(true);
+                    themNV_jOptionPane.showMessageDialog(formNV_jDialog, "Thêm thành công nhân viên!");
+                    formNV_jDialog.setVisible(false);
+                }
+            }
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -775,19 +813,18 @@ public class QuanlyNhanVien {
         System.out.println(value_MANV);
         try {
             Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
+            String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
+                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
+                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
+                    + "CHUCVU, LUONG, TENTK "
+                    + "FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
             ResultSet res = statement.executeQuery(sql);
             System.out.println(value_MANV + " thanh cong");
 
             while (res.next()) {
                 String MaNV = res.getString("MANV");
                 String HoTen = res.getString("HOTEN");
-                String StrCCCD = res.getString("CCCD");
-                int CCCD;
-                if(StrCCCD == null) 
-                    CCCD = 0;
-                else 
-                    CCCD = Integer.parseInt(StrCCCD);
+                String CCCD = res.getString("CCCD");
                 String DiaChi = res.getString("DIACHI");
                 String SDT = res.getString("SDT").substring(1);
                 String Email = res.getString("EMAIL");
@@ -808,7 +845,7 @@ public class QuanlyNhanVien {
                 txt_IDNhanVien.setEditable(false);
 
                 txt_HoTen.setText(HoTen);
-                txt_CCCD.setValue(CCCD);
+                txt_CCCD.setText(CCCD);
                 txt_DiaChi.setText(DiaChi);
                 txt_SDT.setText(SDT);
                 txt_Email.setText(Email);
@@ -822,37 +859,43 @@ public class QuanlyNhanVien {
                 txt_ChucVu.setText(ChucVu);
                 txt_Luong.setValue(Luong);
             }
-
-            System.out.println("Update NV thanh cong");
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private void suaNV_jButtonActionPerformed(ActionEvent evt){
+    private void suaNV_jButtonActionPerformed(ActionEvent evt, int row){
+        DefaultTableModel model = (DefaultTableModel) table_NV.getModel();
+
         String MaNV = txt_IDNhanVien.getText();
         String HoTen = txt_HoTen.getText();
-        Object CCCD = txt_CCCD.getValue();
+        String CCCD = txt_CCCD.getText();
         String DiaChi = txt_DiaChi.getText();
         String SDT = txt_SDT.getText();
         String Email = txt_Email.getText();
         Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
         String NgSinh = txt_NgaySinh.getText();
-        String NgVL = txt_NgayVaoLam.getText();
+        String NVL = txt_NgayVaoLam.getText();
         String ChucVu = txt_ChucVu.getText();
         Object Luong = txt_Luong.getValue();
         try {
             Statement statement = connection.createStatement();
-            String sql = "UPDATE NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = '"+NgSinh+"', NGVL = '"+NgVL+"', CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", TENTK = '' WHERE MANV = '" + MaNV + "'";
-            int res = statement.executeUpdate(sql);
+            String sql = "UPDATE NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = TO_DATE('"+NgSinh+"', 'DD-MM-YYYY'), NGVL = TO_DATE('"+NVL+"', 'DD-MM-YYYY'), CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", TENTK = '' WHERE MANV = '" + MaNV + "'";
+            int res = statement.executeUpdate(sql); 
             suaNV_jOptionPane.setVisible(true);
             suaNV_jOptionPane.showMessageDialog(formNV_jDialog, "Cập nhật nhân viên thành công!");
             formNV_jDialog.setVisible(false);
             System.out.println("Update TK thanh cong");
-//            model.removeRow(row);
+            
+            model.setValueAt(HoTen, row, 1);
+            model.setValueAt(GioiTinh, row, 2);
+            model.setValueAt(NVL, row, 3);
+            model.setValueAt(ChucVu, row, 4);
+            model.setValueAt(Luong, row, 5);
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+      
     
 //    public void uploadimg(ActionEvent e) {
 //        JFileChooser chooser = new JFileChooser();

@@ -4,6 +4,7 @@
  */
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -12,6 +13,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -41,16 +44,13 @@ public class ThanhBen {
     public void init(){
         
         pane_gradient = new JPanelGradient(167,223,255, 255, 184, 183);
-        pane_gradient.setPreferredSize(new Dimension(100, 600));        
+        pane_gradient.setPreferredSize(new Dimension(100, 600));  
+        pane_gradient.setLayout(new java.awt.GridLayout(6, 1));
         btn_NhanVien();
-        btn_KhachHang();
+//        btn_KhachHang();
         btn_HoaDon();
         btn_ThucDon();
         btn_Kho();
-    }
-    
-    public void pane_background(){
-        
     }
 
     public void btn_NhanVien(){    
@@ -61,6 +61,8 @@ public class ThanhBen {
         btn_NhanVien.setCursor(new Cursor(Cursor.HAND_CURSOR));
         Font newButtonFont=new Font(btn_NhanVien.getFont().getName(),Font.BOLD,btn_NhanVien.getFont().getSize());
         btn_NhanVien.setFont(newButtonFont);
+        btn_NhanVien.setToolTipText("Hiển thị trang quản lý nhân viên");
+        btn_NhanVien.setBorder(null);
         
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/employee.png"));
         Image image = icon.getImage().getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
@@ -70,27 +72,18 @@ public class ThanhBen {
         btn_NhanVien.setVerticalTextPosition(SwingConstants.BOTTOM);
         btn_NhanVien.setHorizontalTextPosition(SwingConstants.CENTER);
         
+        btn_NhanVien.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                nhanVien_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                nhanVien_jButtonMouseExited(e);
+            }
+        });
+        
         pane_gradient.add(btn_NhanVien);
-    }
-    
-    public void btn_KhachHang(){
-        btn_KhachHang = new JButton ("KHÁCH HÀNG");
-        btn_KhachHang.setOpaque(false);
-        btn_KhachHang.setContentAreaFilled(false);
-        btn_KhachHang.setFocusPainted(false);
-        btn_KhachHang.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        Font newButtonFont=new Font(btn_KhachHang.getFont().getName(),Font.BOLD,btn_KhachHang.getFont().getSize());
-        btn_KhachHang.setFont(newButtonFont);
-
-        ImageIcon icon = new ImageIcon(getClass().getResource("/image/buyer.png"));
-        Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-        ImageIcon newIcon = new ImageIcon(image); 
-        btn_KhachHang.setIcon(newIcon);
-        
-        btn_KhachHang.setVerticalTextPosition(SwingConstants.BOTTOM);
-        btn_KhachHang.setHorizontalTextPosition(SwingConstants.CENTER);
-        
-        pane_gradient.add(btn_KhachHang);
     }
 
     public void btn_HoaDon(){
@@ -101,6 +94,8 @@ public class ThanhBen {
         btn_HoaDon.setCursor(new Cursor(Cursor.HAND_CURSOR));
         Font newButtonFont=new Font(btn_HoaDon.getFont().getName(),Font.BOLD,btn_HoaDon.getFont().getSize());
         btn_HoaDon.setFont(newButtonFont);
+        btn_HoaDon.setToolTipText("Hiển thị trang quản lý hóa đơn");
+        btn_HoaDon.setBorder(null);
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/bill.png"));
         Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -109,6 +104,17 @@ public class ThanhBen {
         
         btn_HoaDon.setVerticalTextPosition(SwingConstants.BOTTOM);
         btn_HoaDon.setHorizontalTextPosition(SwingConstants.CENTER);
+        
+        btn_HoaDon.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                hoaDon_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hoaDon_jButtonMouseExited(e);
+            }
+        });
         
         pane_gradient.add(btn_HoaDon);
     }
@@ -121,6 +127,8 @@ public class ThanhBen {
         btn_ThucDon.setCursor(new Cursor(Cursor.HAND_CURSOR));
         Font newButtonFont=new Font(btn_ThucDon.getFont().getName(),Font.BOLD,btn_ThucDon.getFont().getSize());
         btn_ThucDon.setFont(newButtonFont);
+        btn_ThucDon.setToolTipText("Hiển thị trang quản lý thực đơn");
+        btn_ThucDon.setBorder(null);
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/menu.png"));
         Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -129,6 +137,17 @@ public class ThanhBen {
         
         btn_ThucDon.setVerticalTextPosition(SwingConstants.BOTTOM);
         btn_ThucDon.setHorizontalTextPosition(SwingConstants.CENTER);
+        
+        btn_ThucDon.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                thucDon_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                thucDon_jButtonMouseExited(e);
+            }
+        });
         
         pane_gradient.add(btn_ThucDon);
     }
@@ -142,6 +161,8 @@ public class ThanhBen {
         btn_Kho.setCursor(new Cursor(Cursor.HAND_CURSOR));
         Font newButtonFont=new Font(btn_Kho.getFont().getName(),Font.BOLD,btn_Kho.getFont().getSize());
         btn_Kho.setFont(newButtonFont);
+        btn_Kho.setToolTipText("Hiển thị trang quản lý kho");
+        btn_Kho.setBorder(null);
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/image/cardboard.png"));
         Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -151,6 +172,51 @@ public class ThanhBen {
         btn_Kho.setVerticalTextPosition(SwingConstants.BOTTOM);
         btn_Kho.setHorizontalTextPosition(SwingConstants.CENTER);
         
+        btn_Kho.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                kho_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                kho_jButtonMouseExited(e);
+            }
+        });
         pane_gradient.add(btn_Kho);
+    }
+    private void nhanVien_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_NhanVien.setContentAreaFilled(true);
+        btn_NhanVien.setBackground(Color.GRAY);
+    }
+
+    private void nhanVien_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_NhanVien.setContentAreaFilled(false);
+    }
+
+    private void hoaDon_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_HoaDon.setContentAreaFilled(true);
+        btn_HoaDon.setBackground(Color.GRAY);
+    }
+
+    private void hoaDon_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_HoaDon.setContentAreaFilled(false);
+    }
+
+    private void thucDon_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_ThucDon.setContentAreaFilled(true);
+        btn_ThucDon.setBackground(Color.GRAY);
+    }
+
+    private void thucDon_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_ThucDon.setContentAreaFilled(false);
+    }
+
+    private void kho_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_Kho.setContentAreaFilled(true);
+        btn_Kho.setBackground(Color.GRAY);
+    }
+
+    private void kho_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_Kho.setContentAreaFilled(false);
     }
 }

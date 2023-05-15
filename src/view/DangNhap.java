@@ -41,7 +41,7 @@ public class DangNhap{
     public JLabel DangKy;
     
     public JOptionPane SaiTK_jOptionPane = new JOptionPane();
-
+    public JOptionPane ThieuThongTin_jOptionPane = new JOptionPane();
     
     public DangNhap() throws IOException{
         init();

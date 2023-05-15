@@ -742,8 +742,6 @@ public class QuanlyNhanVien {
         String ChucVu = txt_ChucVu.getText();
         String NVL = txt_NgayVaoLam.getText();
         Object Luong = txt_Luong.getValue();
-        
-
                     
         try {
             Statement statement = connection.createStatement();

@@ -169,16 +169,15 @@ public class DangNhap{
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.insets = new Insets(0, 0, 0, 0);
-        JLabel forget = new JLabel("Quên mật khẩu ?");
+        JLabel forget = new JLabel("Quên mật khẩu?");
         forget.setBorder(new EmptyBorder(10, 0, 0,0));
         forget.setFont(new Font("SansSerif", Font.PLAIN, 16));
         forget.setCursor(new Cursor(Cursor.HAND_CURSOR));
         JPanel pane_forget = new JPanel();
         pane_forget.setLayout( new FlowLayout(FlowLayout.RIGHT) );
         pane_forget.setBackground(Color.white);
-        pane_forget.add(forget);
+//        pane_forget.add(forget);
         pane_account.add(pane_forget, gbc);
-        
         
         pane_login.add(pane_account);
         btn_DangNhap();
@@ -255,8 +254,8 @@ public class DangNhap{
     }
     
     public void DangKy(){
-        JLabel Text =new JLabel("Đăng ký tài khoản khách hàng ");
-        Text.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JLabel Text =new JLabel("There is no sincerer love than the love of food...");
+        Text.setFont(new Font("SansSerif", Font.ITALIC, 16));
         DangKy =new JLabel("Bấm vào đây");
         DangKy.setFont(new Font("SansSerif", Font.BOLD, 16));
         DangKy.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -265,7 +264,7 @@ public class DangNhap{
         pane_DangKy.setBackground(Color.white);
         pane_DangKy.setBorder(new EmptyBorder(20, 0, 0,0));
         pane_DangKy.add(Text);
-        pane_DangKy.add(DangKy);
+//        pane_DangKy.add(DangKy);
         
         pane_login.add(pane_DangKy);
     }

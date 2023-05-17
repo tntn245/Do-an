@@ -56,7 +56,13 @@ public class MainFrame extends JFrame {
     
     private QuanlyKho QLKho;
     JPanel pane_QLKho;
+    
+    private PhieuNhap PhieuNhap;
+    JPanel pane_PhieuNhap;
 
+    private PhieuXuat PhieuXuat;
+    JPanel pane_PhieuXuat;
+    
     public MainFrame() throws IOException, SQLException{
         init();        
         setVisible(true);
@@ -92,6 +98,12 @@ public class MainFrame extends JFrame {
         
         QLKho = new QuanlyKho(connection);
         pane_QLKho = QLKho.pane_QLKho();
+        
+        PhieuNhap = new PhieuNhap(connection);
+        pane_PhieuNhap = PhieuNhap.pane_PhieuNhap();
+        
+        PhieuXuat = new PhieuXuat(connection);
+        pane_PhieuXuat = PhieuXuat.pane_PhieuXuat();
     }
     
     public void ConnectDB() throws SQLException{
@@ -166,6 +178,14 @@ public class MainFrame extends JFrame {
                     pane_QLKho.setVisible(false);
                     pane_QLNV.setVisible(true);
                 }
+                if(pane_PhieuNhap.isDisplayable()){
+                    pane_PhieuNhap.setVisible(false);
+                    pane_QLNV.setVisible(true);
+                }  
+                if(pane_PhieuXuat.isDisplayable()){
+                    pane_PhieuXuat.setVisible(false);
+                    pane_QLNV.setVisible(true);
+                } 
                 add(pane_QLNV,BorderLayout.CENTER);
             }
         });
@@ -181,12 +201,102 @@ public class MainFrame extends JFrame {
                     pane_QLNV.setVisible(false);
                     pane_QLKho.setVisible(true);
                 }
+                if(pane_PhieuNhap.isDisplayable()){
+                    pane_PhieuNhap.setVisible(false);
+                    pane_QLKho.setVisible(true);
+                }          
+                if(pane_PhieuXuat.isDisplayable()){
+                    pane_PhieuXuat.setVisible(false);
+                    pane_QLKho.setVisible(true);
+                }      
                 add(pane_QLKho,BorderLayout.CENTER);
             }
         });
+
+        QLKho.btn_PhieuNhap.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam phieu nhap");
+                if(pane_QLKho.isDisplayable()){
+                    pane_QLKho.setVisible(false);
+                    pane_PhieuNhap.setVisible(true);
+                }
+                if(pane_PhieuXuat.isDisplayable()){
+                    pane_PhieuXuat.setVisible(false);
+                    pane_PhieuNhap.setVisible(true);
+                }
+                add(pane_PhieuNhap, BorderLayout.CENTER);
+            }
+        });
+        
+        QLKho.btn_PhieuXuat.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam phieu xuat");
+                if(pane_QLKho.isDisplayable()){
+                    pane_QLKho.setVisible(false);
+                    pane_PhieuXuat.setVisible(true);
+                }
+                if(pane_PhieuNhap.isDisplayable()){
+                    pane_PhieuNhap.setVisible(false);
+                    pane_PhieuXuat.setVisible(true);
+                }
+                add(pane_PhieuXuat, BorderLayout.CENTER);
+            }
+        });
     }    
+
+    public void QLPhieuNhap(){
+        PhieuNhap.btn_Kho.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam kho");
+                if(pane_PhieuNhap.isDisplayable()){
+                    pane_PhieuNhap.setVisible(false);
+                    pane_QLKho.setVisible(true);
+                }
+                add(pane_QLKho, BorderLayout.CENTER);
+            }
+        });
+        
+        PhieuNhap.btn_PhieuXuat.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam phieu xuat");
+                if(pane_PhieuNhap.isDisplayable()){
+                    pane_PhieuNhap.setVisible(false);
+                    pane_PhieuXuat.setVisible(true);
+                }
+                add(pane_PhieuXuat, BorderLayout.CENTER);
+            }
+        });
+        
+        PhieuNhap.btn_XacNhan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                QLKho.add_data_table();
+            }
+        });
+    }        
     
-    
+    public void QLPhieuXuat(){
+        PhieuXuat.btn_Kho.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam kho");
+                if(pane_PhieuXuat.isDisplayable()){
+                    pane_PhieuXuat.setVisible(false);
+                    pane_QLKho.setVisible(true);
+                }
+                add(pane_QLKho, BorderLayout.CENTER);
+            }
+        });
+        
+        PhieuXuat.btn_PhieuNhap.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Da bam phieu nhap");
+                if(pane_PhieuXuat.isDisplayable()){
+                    pane_PhieuXuat.setVisible(false);
+                    pane_PhieuNhap.setVisible(true);
+                }
+                add(pane_PhieuNhap, BorderLayout.CENTER);
+            }
+        });
+    }        
     public void Choose_Regist(){
         dangnhap.DangKy.addMouseListener(new MouseAdapter(){
             @Override
@@ -247,6 +357,8 @@ public class MainFrame extends JFrame {
         Return_Login();
         QLNV();
         QLKho();
+        QLPhieuNhap();
+        QLPhieuXuat();
     }
 }
 

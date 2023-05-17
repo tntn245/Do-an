@@ -77,11 +77,8 @@ public class QuanlyNhanVien {
     public JTextField txtSearch;
     
     public JDialog formNV_jDialog;
-    public JPanel pane_bg_ThemNV;
-    public JPanel pane_ThemNV;
     public JOptionPane themNV_jOptionPane = new JOptionPane();
     public JOptionPane suaNV_jOptionPane = new JOptionPane();
-    public JOptionPane confirm_xoaNV_jOptionPane = new JOptionPane();
     
     private JTextField txt_IDNhanVien;
     private JTextField txt_HoTen;
@@ -135,7 +132,6 @@ public class QuanlyNhanVien {
         pane_Search.setBackground(Color.white);
         pane_Search.setPreferredSize(new Dimension(800, 70)); 
         pane_search();
-        pane_ThemNV();
         btn_ThemNV();
         pane_QLNV.add(pane_Search);
     }
@@ -157,7 +153,9 @@ public class QuanlyNhanVien {
                 txtSearch.setForeground(Color.BLACK);
             }
             public void focusLost(FocusEvent e) {
-                // nothing
+//                txtSearch.setText(" Search");
+//                txtSearch.setForeground(Color.GRAY);
+//                txtSearch.setFont(new Font("SansSerif", Font.PLAIN, 14));
             }
         });
         
@@ -175,6 +173,7 @@ public class QuanlyNhanVien {
         
         String colname_NV[] = { "MANV", "HOTEN", "CCCD", "DIACHI", "SDT", "EMAIL", "GIOITINH", "NGSINH", "NGVL", "CHUCVU", "LUONG", "TENTK" };
         boxSearch = new JComboBox(colname_NV);
+        boxSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boxSearch.setSelectedItem("HOTEN");
         boxSearch.setFont(new Font("SansSerif", Font.BOLD, 14));
         boxSearch.setBackground(Color.white);
@@ -189,18 +188,6 @@ public class QuanlyNhanVien {
         pane_Search.add(pane_search_bar);
         pane_Search.add(boxSearch);
         pane_Search.setBorder(new EmptyBorder(10, 0, 0, 0));
-    }
-    
-    public void pane_ThemNV(){
-        pane_bg_ThemNV = new JPanel();
-        pane_bg_ThemNV.setBackground(new Color(0,0,0,50));
-        pane_bg_ThemNV.setPreferredSize(new Dimension(769, 550));
-        pane_bg_ThemNV.setBounds(8, 7, 769, 550);
-        
-        pane_ThemNV = new JPanel();
-        pane_ThemNV.setBackground(Color.white);
-        pane_ThemNV.setPreferredSize(new Dimension(600, 500));
-        pane_ThemNV.setBounds(70, 30, 600, 500);
     }
     
     public void Search(){
@@ -319,7 +306,10 @@ public class QuanlyNhanVien {
         txt_Luong = new JFormattedTextField(formatter);
         txt_DiaChi = new JTextField();
         
-        JButton btn_cancel_themNV = new JButton("HỦY");
+        ButtonGradient btn_cancel_themNV = new ButtonGradient();
+        btn_cancel_themNV.setText("HỦY");
+        btn_cancel_themNV.setColor1(new Color(255,231,231));
+        btn_cancel_themNV.setColor2(new Color(255,130,145));
         btn_cancel_themNV.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Exit_Dialog_jButtonActionPerformed(evt);
@@ -327,13 +317,16 @@ public class QuanlyNhanVien {
         });
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 68;
+        gbc.gridx = 62;
         gbc.gridy = 18;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         formNV_jDialog.getContentPane().add(btn_cancel_themNV, gbc);
         
-        JButton btn_XacNhan = new JButton("XÁC NHẬN");
+        ButtonGradient btn_XacNhan = new ButtonGradient();
+        btn_XacNhan.setText("XÁC NHẬN");
+        btn_XacNhan.setColor1(new Color(225,244,255));
+        btn_XacNhan.setColor2(new Color(133,210,255));
         btn_XacNhan.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if(loai)
@@ -343,7 +336,7 @@ public class QuanlyNhanVien {
             }
         });
         gbc = new GridBagConstraints();
-        gbc.gridx = 62;
+        gbc.gridx = 68;
         gbc.gridy = 18;
         gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -605,36 +598,12 @@ public class QuanlyNhanVien {
         columnModel.getColumn(5).setPreferredWidth(100);
         columnModel.getColumn(6).setPreferredWidth(100);
 //        columnModel.getColumn(7).setPreferredWidth(100);
-        try{
-            String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
-                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
-                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
-                    + "CHUCVU, LUONG, TENTK "
-                    + "FROM NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
-            Statement statement = connection.createStatement();
-            ResultSet res = statement.executeQuery(sql);
-
-            while(res.next()){
-                String MANV = res.getString("MANV");
-                String HOTEN = res.getString("HOTEN");
-                String GIOITINH = res.getString("GIOITINH");
-                String NGVL = res.getString("NGVL");
-                String CHUCVU = res.getString("CHUCVU");
-                Object LUONG = res.getObject("LUONG");
-                String TENTK = res.getString("TENTK");
-
-                Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, TENTK, null};
-                DefaultTableModel tbmodel = (DefaultTableModel)table_NV.getModel();
-                tbmodel.addRow(tbdata);
-            }
-        }
-        catch(SQLException | HeadlessException ex){
-                    System.out.println("the error is"+ex);
-        }
         
+        add_data_table();
+
         table_NV.setPreferredScrollableViewportSize(table_NV.getPreferredSize());
         table_NV.setFillsViewportHeight(true);
-//        table_NV.setSelectionBackground(new Color(56, 138, 112));
+//        table_NV.setSelectionBackground(new Color(0, 0, 0, 0));
         
         TableActionEvent event = new TableActionEvent() {
             @Override
@@ -673,8 +642,8 @@ public class QuanlyNhanVien {
 //            @Override
 //            public void onCreateAccount(int row) {}
         };
-        table_NV.getColumnModel().getColumn(7).setCellRenderer(new TableActionCellRender());
-        table_NV.getColumnModel().getColumn(7).setCellEditor(new TableActionCellEditor(event));
+        table_NV.getColumnModel().getColumn(7).setCellRenderer(new TableActionCellRender(new Color(234,247,255), new Color(255, 237, 243)));
+        table_NV.getColumnModel().getColumn(7).setCellEditor(new TableActionCellEditor(event, new Color(234,247,255), new Color(255, 237, 243)));
         
         
         Scrollpane_TableNV.setViewportView(table_NV);
@@ -701,6 +670,35 @@ public class QuanlyNhanVien {
         }
     }
     
+    public void add_data_table(){
+        try{
+            String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
+                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
+                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
+                    + "CHUCVU, LUONG, TENTK "
+                    + "FROM NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
+            Statement statement = connection.createStatement();
+            ResultSet res = statement.executeQuery(sql);
+
+            while(res.next()){
+                String MANV = res.getString("MANV");
+                String HOTEN = res.getString("HOTEN");
+                String GIOITINH = res.getString("GIOITINH");
+                String NGVL = res.getString("NGVL");
+                String CHUCVU = res.getString("CHUCVU");
+                Object LUONG = res.getObject("LUONG");
+                String TENTK = res.getString("TENTK");
+
+                Object tbdata[] = {MANV, HOTEN, GIOITINH, NGVL, CHUCVU, LUONG, TENTK, null};
+                DefaultTableModel tbmodel = (DefaultTableModel)table_NV.getModel();
+                tbmodel.addRow(tbdata);
+            }
+        }
+        catch(SQLException | HeadlessException ex){
+                    System.out.println("the error is"+ex);
+        }
+    }
+    
     private void Exit_Dialog_jButtonActionPerformed(ActionEvent evt) {
         formNV_jDialog.setVisible(false);
     }
@@ -717,7 +715,9 @@ public class QuanlyNhanVien {
             Statement statement = connection.createStatement();
             String sql = "SELECT TO_NUMBER(SUBSTR(MANV, 3))+1 NUM_NV FROM NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 )) DESC";
             ResultSet res = statement.executeQuery(sql);
+            boolean flag = false;
             while(res.next()){
+                flag = true;
                 MANV = "NV" + res.getInt("NUM_NV");
                 txt_IDNhanVien.setText(MANV);
                 txt_IDNhanVien.setForeground(new Color (134, 134, 134));
@@ -725,6 +725,8 @@ public class QuanlyNhanVien {
                 System.out.println("set " + MANV + " thanh cong" );
                 break;
             }
+            if(!flag)
+                MANV = "NV1";
         }
         catch(SQLException | HeadlessException ex){
             System.out.println("the error is "+ex);
@@ -774,7 +776,12 @@ public class QuanlyNhanVien {
         }
         
         try{
-            String sql= "SELECT * FROM NHANVIEN WHERE MANV = '" + MaNV +"'";
+//            String sql= "SELECT * FROM NHANVIEN WHERE MANV = '" + MaNV +"'";
+            String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
+                    + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
+                    + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
+                    + "CHUCVU, LUONG, TENTK "
+                    + "FROM NHANVIEN WHERE MANV = '" + MaNV +"'";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
 

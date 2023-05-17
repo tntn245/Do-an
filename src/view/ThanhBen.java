@@ -32,10 +32,11 @@ import javax.swing.border.EmptyBorder;
 public class ThanhBen {
     public JPanelGradient pane_gradient;
     public JButton btn_NhanVien;
-    public JButton btn_KhachHang;
+//    public JButton btn_KhachHang;
     public JButton btn_HoaDon;
     public JButton btn_ThucDon;
     public JButton btn_Kho;
+    public JButton btn_ThongKe;
 
     public ThanhBen(){
         init();
@@ -51,6 +52,7 @@ public class ThanhBen {
         btn_HoaDon();
         btn_ThucDon();
         btn_Kho();
+        btn_ThongKe();
     }
 
     public void btn_NhanVien(){    
@@ -184,6 +186,39 @@ public class ThanhBen {
         });
         pane_gradient.add(btn_Kho);
     }
+    
+    public void btn_ThongKe(){
+        btn_ThongKe = new JButton ("THỐNG KÊ");
+        btn_ThongKe.setOpaque(false);
+        btn_ThongKe.setContentAreaFilled(false);
+        btn_ThongKe.setFocusPainted(false);
+        btn_ThongKe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        Font newButtonFont=new Font(btn_ThongKe.getFont().getName(),Font.BOLD,btn_ThongKe.getFont().getSize());
+        btn_ThongKe.setFont(newButtonFont);
+        btn_ThongKe.setToolTipText("Hiển thị trang báo cáo- thống kê");
+        btn_ThongKe.setBorder(null);
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/image/pngegg.png"));
+        Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(image); 
+        btn_ThongKe.setIcon(newIcon);
+        
+        btn_ThongKe.setVerticalTextPosition(SwingConstants.BOTTOM);
+        btn_ThongKe.setHorizontalTextPosition(SwingConstants.CENTER);
+        
+        btn_ThongKe.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                thongke_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                thongke_jButtonMouseExited(e);
+            }
+        });
+        pane_gradient.add(btn_ThongKe);
+    }
+    
     private void nhanVien_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
         btn_NhanVien.setContentAreaFilled(true);
         btn_NhanVien.setBackground(Color.GRAY);
@@ -218,5 +253,14 @@ public class ThanhBen {
 
     private void kho_jButtonMouseExited(java.awt.event.MouseEvent evt) {
         btn_Kho.setContentAreaFilled(false);
+    }
+    
+    private void thongke_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_ThongKe.setContentAreaFilled(true);
+        btn_ThongKe.setBackground(Color.GRAY);
+    }
+
+    private void thongke_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_ThongKe.setContentAreaFilled(false);
     }
 }

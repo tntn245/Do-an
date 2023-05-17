@@ -4,6 +4,7 @@
  */
 package view;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
@@ -55,11 +56,11 @@ public class PanelAction extends JPanel {
         cmdEdit = new ActionButton();
         cmdDelete = new ActionButton();
 
-//        cmdEdit.setText("Sửa");
-//        cmdDelete.setText("Xóa");
         cmdEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/edit.png"))); // NOI18N
         cmdDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/delete.png"))); // NOI18N
 
+        cmdEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cmdDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);

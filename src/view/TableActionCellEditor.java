@@ -4,6 +4,7 @@
  */
 package view;
 
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
@@ -16,10 +17,14 @@ import javax.swing.JTable;
 public class TableActionCellEditor extends DefaultCellEditor {
 
     private TableActionEvent event;
+    private Color color1;
+    private Color color2;
 
-    public TableActionCellEditor(TableActionEvent event) {
+    public TableActionCellEditor(TableActionEvent event, Color color1, Color color2) {
         super(new JCheckBox());
         this.event = event;
+        this.color1= color1;
+        this.color2= color2;
     }
 
     @Override
@@ -27,6 +32,11 @@ public class TableActionCellEditor extends DefaultCellEditor {
         PanelAction action = new PanelAction();
         action.initEvent(event, row);
 //        action.setBackground(jtable.getSelectionBackground());
+        if (row % 2 == 0) {
+            action.setBackground(color1);
+        } else {
+            action.setBackground(color2);
+        }
         return action;
     }
 }

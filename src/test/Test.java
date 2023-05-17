@@ -40,8 +40,8 @@ public class Test extends JFrame {
 //                System.out.println("View row : " + row);
 //            }
         };
-        table.getColumnModel().getColumn(3).setCellRenderer(new TableActionCellRender());
-        table.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor(event));
+//        table.getColumnModel().getColumn(3).setCellRenderer(new TableActionCellRender());
+//        table.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor(event));
     }
 
     /**

@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -85,6 +86,8 @@ public class QuanlyKho {
     private JFormattedTextField txt_DonGia;
     private JComboBox txt_DonVi;
     private JFormattedTextField txt_SoLuong;
+    private JTextField txt_MaNCC;
+    private JComboBox txt_TenNCC;
 
     private JOptionPane ThieuThongTin_jOptionPane = new JOptionPane();
     private JOptionPane NLTontai_jOptionPane = new JOptionPane();
@@ -226,7 +229,7 @@ public class QuanlyKho {
     public void init_Dialog(){
         formNL_jDialog = new JDialog();
         formNL_jDialog.getContentPane().setBackground(new Color(255, 255, 255));
-        formNL_jDialog.setPreferredSize(new Dimension(600, 350));
+        formNL_jDialog.setPreferredSize(new Dimension(600, 400));
         formNL_jDialog.setModal(true);
         formNL_jDialog.setResizable(false);
         formNL_jDialog.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0,30));
@@ -241,6 +244,8 @@ public class QuanlyKho {
         JLabel DONGIA = new JLabel("Đơn giá:");
         JLabel DONVI = new JLabel("Đơn vị:");
         JLabel TONGSL = new JLabel("Tổng số lượng:");
+        JLabel MANCC = new JLabel("Mã nhà cung cấp:");
+        JLabel TENNCC = new JLabel("Tên nhà cung cấp:");
         
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
@@ -251,14 +256,28 @@ public class QuanlyKho {
         formatter.setCommitsOnValidEdit(true);
         
         txt_MaNL = new JTextField();
-        
         txt_TenNL = new JTextField();
         txt_DonGia = new JFormattedTextField(formatter);
         txt_SoLuong = new JFormattedTextField(formatter);
-
         String StrDonVi[] = { "Kg", "g", "Cái", "Lon", "Chai", "Lít", "ml"}; 
         txt_DonVi = new JComboBox(StrDonVi);
         txt_DonVi.setSelectedIndex(0);
+        txt_MaNCC = new JTextField();
+        txt_TenNCC = new JComboBox();
+        ArrayList<String> StrTenNCC = new ArrayList<String>(); 
+        Object[] arrTenNCC = ChonThongTinNCC(StrTenNCC);
+        for (int i=0; i <arrTenNCC.length; i++){
+            txt_TenNCC.addItem(arrTenNCC[i]);
+        }
+        setText_NCC(txt_TenNCC.getItemAt(txt_TenNCC.getSelectedIndex()));
+        txt_TenNCC.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) { 
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    Object item = e.getItem();
+                    setText_NCC(item);
+                }
+            }
+        });
 //"<Thêm mới>",
 //        txt_DonVi.addItemListener(new ItemListener() {
 //            public void itemStateChanged(ItemEvent e) { 
@@ -290,6 +309,15 @@ public class QuanlyKho {
         pane_ChiTietNL.add(txt_DonGia);
         pane_ChiTietNL.add(txt_DonVi);
         pane_ChiTietNL.add(txt_SoLuong);
+        
+        JPanel pane_NCC = new JPanel();
+        pane_NCC.setPreferredSize(new Dimension(500, 50));
+        pane_NCC.setLayout(new GridLayout(2, 2, 100, 0));
+        pane_NCC.setBackground(Color.white);
+        pane_NCC.add(MANCC);
+        pane_NCC.add(TENNCC);
+        pane_NCC.add(txt_MaNCC);
+        pane_NCC.add(txt_TenNCC);        
 
         if(loai){
             setText_nextMANL();
@@ -300,13 +328,13 @@ public class QuanlyKho {
         }
         
         formNL_jDialog.getContentPane().add(pane_TongQuanNL);
-        formNL_jDialog.getContentPane().add(pane_ChiTietNL);
-        
+        formNL_jDialog.getContentPane().add(pane_NCC);  
+        formNL_jDialog.getContentPane().add(pane_ChiTietNL);      
                
         JPanel pane_btn_DialogNL = new JPanel();
         pane_btn_DialogNL.setLayout(new FlowLayout(FlowLayout.RIGHT, 15,0));
         pane_btn_DialogNL.setPreferredSize(new Dimension(500, 80));
-        pane_btn_DialogNL.setBorder(new EmptyBorder(50, 0, 0, 0));
+        pane_btn_DialogNL.setBorder(new EmptyBorder(30, 0, 0, 0));
         pane_btn_DialogNL.setBackground(Color.white);
         
         ButtonGradient btn_cancel_themNL = new ButtonGradient();
@@ -336,6 +364,48 @@ public class QuanlyKho {
         formNL_jDialog.getContentPane().add(pane_btn_DialogNL);
     }
     
+    public Object[] ChonThongTinNCC(ArrayList<String> StrTenNCC){
+        try{
+            String sql = "SELECT TENNCC FROM NHACUNGCAP";
+            Statement statement = connection.createStatement();
+            ResultSet res = statement.executeQuery(sql);
+
+            while(res.next()){
+                String TENNCC = res.getString("TENNCC");
+                StrTenNCC.add(TENNCC);
+            }
+        }
+        catch(SQLException | HeadlessException ex){
+            System.out.println("the error is"+ex);
+        }
+        
+        Object[] arr = StrTenNCC.toArray();
+        return arr;
+    }
+    
+    private void setText_NCC(Object TENNCC){
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM NHACUNGCAP WHERE TENNCC = '"+TENNCC+"'";
+            ResultSet res = statement.executeQuery(sql);
+            while(res.next()){
+                String MANCC = res.getString("MANCC");
+                txt_MaNCC.setText(MANCC);
+                txt_MaNCC.setForeground(new Color (134, 134, 134));
+                txt_MaNCC.setEditable(false);
+                
+//                String DIACHI = res.getString("DIACHI");
+//                txt_DiaChi.setText(DIACHI);
+//                txt_DiaChi.setForeground(new Color (134, 134, 134));
+//                txt_DiaChi.setEditable(false);
+                
+                break;
+            }
+        }
+        catch(SQLException | HeadlessException ex){
+            System.out.println("the error is "+ex);
+        }
+    }
     
     public void btn_PhieuNhap(){
         btn_PhieuNhap = new ButtonGradient();
@@ -409,10 +479,10 @@ public class QuanlyKho {
     public void table_NL(){
         Scrollpane_TableKho= new JScrollPane();
 
-        String[] columnNames = {"Mã NL", "Tên nguyên liệu", "Đơn giá", "Đơn vị", "Tổng số lượng", ""};
+        String[] columnNames = {"Mã NL", "Tên nguyên liệu", "Đơn giá", "Đơn vị", "Tổng số lượng", "Mã NCC", ""};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, true
+                false, false, false, false, false, false, true
             };
             
             @Override
@@ -449,10 +519,11 @@ public class QuanlyKho {
         
         TableColumnModel columnModel = table_Kho.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(100);
-        columnModel.getColumn(1).setPreferredWidth(200);
+        columnModel.getColumn(1).setPreferredWidth(150);
         columnModel.getColumn(2).setPreferredWidth(150);
         columnModel.getColumn(3).setPreferredWidth(100);
-        columnModel.getColumn(4).setPreferredWidth(150);
+        columnModel.getColumn(4).setPreferredWidth(100);
+        columnModel.getColumn(5).setPreferredWidth(100);
         
         add_data_table();
         
@@ -490,8 +561,8 @@ public class QuanlyKho {
                 }
             }
         };
-        table_Kho.getColumnModel().getColumn(5).setCellRenderer(new TableActionCellRender(new Color(234,247,255), new Color(255, 237, 243)));
-        table_Kho.getColumnModel().getColumn(5).setCellEditor(new TableActionCellEditor(event, new Color(234,247,255), new Color(255, 237, 243)));
+        table_Kho.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender(new Color(234,247,255), new Color(255, 237, 243)));
+        table_Kho.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event, new Color(234,247,255), new Color(255, 237, 243)));
         
         Scrollpane_TableKho.setViewportView(table_Kho);
         Scrollpane_TableKho.setBorder(new LineBorder( Color.LIGHT_GRAY, 1, true));
@@ -512,8 +583,9 @@ public class QuanlyKho {
                 String DONGIA = res.getString("DONGIA");
                 String DONVI = res.getString("DONVI");
                 String TONGSL = res.getString("TONGSL");
+                String MANCC = res.getString("MANCC");
 
-                Object tbdata[] = {MANL, TENNL, DONGIA, DONVI, TONGSL, null};
+                Object tbdata[] = {MANL, TENNL, DONGIA, DONVI, TONGSL, MANCC, null};
                 tbmodel.addRow(tbdata);
             }
         }
@@ -597,6 +669,7 @@ public class QuanlyKho {
         Object DonGia = txt_DonGia.getValue();
         Object DonVi = txt_DonVi.getItemAt(txt_DonVi.getSelectedIndex());
         Object SoLuong = txt_SoLuong.getValue();
+        String MaNCC = txt_MaNCC.getText();            
                 
         try {
             Statement statement = connection.createStatement();
@@ -606,7 +679,7 @@ public class QuanlyKho {
                 ThieuThongTin_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
             } else {
                 boolean flag_NLtontai = false;
-                String sql = "SELECT * FROM KHONGUYENLIEU WHERE TENNL = '" + TenNL + "'";
+                String sql = "SELECT * FROM KHONGUYENLIEU WHERE TENNL = '" + TenNL + "' AND MANCC = '" + MaNCC + "'";
                 ResultSet res_select = statement.executeQuery(sql);
                 while (res_select.next()) {
                     flag_NLtontai = true;
@@ -617,7 +690,7 @@ public class QuanlyKho {
                     NLTontai_jOptionPane.setMessageType(JOptionPane.ERROR_MESSAGE);                    
                 }
                 else {
-                    sql = "INSERT INTO KHONGUYENLIEU VALUES (  '" + MaNL + "' , '" + TenNL + "', '" + DonGia + "', '" + DonVi + "', 0 )";
+                    sql = "INSERT INTO KHONGUYENLIEU VALUES (  '" + MaNL + "' , '" + TenNL + "', '" + DonGia + "', '" + DonVi + "', 0, '" + MaNCC + "' )";
                     int res = statement.executeUpdate(sql);
                     System.out.println("Insert thanh cong");
                     themNL_jOptionPane.setVisible(true);
@@ -640,9 +713,9 @@ public class QuanlyKho {
                 String DONGIA = res.getString("DONGIA");
                 String DONVI = res.getString("DONVI");
                 String TONGSL = res.getString("TONGSL");
-
+                String MANCC = res.getString("MANCC");
                 
-                Object tbdata[] = {MANL, TENNL, DONGIA, DONVI, TONGSL, null};
+                Object tbdata[] = {MANL, TENNL, DONGIA, DONVI, TONGSL, MANCC, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_Kho.getModel();
                 tbmodel.addRow(tbdata);
                 break;
@@ -686,17 +759,29 @@ public class QuanlyKho {
                     TONGSL = 0;
                 else 
                     TONGSL = Integer.parseInt(StrTONGSL);
+                String MANCC = res.getString("MANCC");
                 
                 txt_MaNL.setText(MANL);
                 txt_MaNL.setForeground(new Color(134, 134, 134));
                 txt_MaNL.setEditable(false);
-
+                
                 txt_TenNL.setText(TENNL);
                 txt_DonGia.setValue(DONGIA);
                 txt_DonVi.setSelectedItem(DONVI);
                 txt_SoLuong.setValue(TONGSL);
                 txt_SoLuong.setForeground(new Color(134, 134, 134));
                 txt_SoLuong.setEditable(false);
+                                
+                txt_MaNCC.setText(MANCC);
+                txt_MaNCC.setForeground(new Color(134, 134, 134));
+                txt_MaNCC.setEditable(false);
+                sql = "SELECT * FROM NHACUNGCAP WHERE MANCC = '" + MANCC + "'";
+                res = statement.executeQuery(sql);
+                    while (res.next()) {
+                        String TENNCC = res.getString("TENNCC");
+                        txt_TenNCC.setSelectedItem(TENNCC);
+                    }
+                break;
             }
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -710,9 +795,10 @@ public class QuanlyKho {
         Object DonGia = txt_DonGia.getValue();
         Object DonVi = txt_DonVi.getItemAt(txt_DonVi.getSelectedIndex());
         Object SoLuong = txt_SoLuong.getValue();
+        String MaNCC = txt_MaNCC.getText();
         try {
             Statement statement = connection.createStatement();
-            String sql = "UPDATE KHONGUYENLIEU SET MANL = '"+MaNL+"', TENNL = '" +TenNL+ "', DONGIA = " +DonGia+ ", DONVI = '"+DonVi+"', TONGSL = "+SoLuong+" WHERE MANL = '" + MaNL +"'";
+            String sql = "UPDATE KHONGUYENLIEU SET MANL = '"+MaNL+"', TENNL = '" +TenNL+ "', DONGIA = " +DonGia+ ", DONVI = '"+DonVi+"', TONGSL = "+SoLuong+", MANCC = '"+MaNCC+"' WHERE MANL = '" + MaNL +"'";
             int res = statement.executeUpdate(sql); 
             suaNL_jOptionPane.setVisible(true);
             suaNL_jOptionPane.showMessageDialog(formNL_jDialog, "Cập nhật nguyên liệu thành công!");
@@ -723,6 +809,7 @@ public class QuanlyKho {
             model.setValueAt(DonGia, row, 2);
             model.setValueAt(DonVi, row, 3);
             model.setValueAt(SoLuong, row, 4);
+            model.setValueAt(MaNCC, row, 5);
         } catch (SQLException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

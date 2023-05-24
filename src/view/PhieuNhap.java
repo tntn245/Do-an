@@ -11,16 +11,20 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -65,8 +69,8 @@ public class PhieuNhap {
     public ButtonGradient btn_Kho;
     public ButtonGradient btn_PhieuXuat;
     public ButtonGradient btn_ThemPhieuNhap;
-    public ButtonGradient btn_XacNhan;
-    public ButtonGradient btn_cancel_themPN;
+    public ButtonGradient btn_XacNhan  = new ButtonGradient();;
+    public ButtonGradient btn_cancel_themPN  = new ButtonGradient();;
         
     public JPanel pane_Search;
     public JButton btn_Search;
@@ -80,9 +84,11 @@ public class PhieuNhap {
     private JTextField txt_MaNL;
     private JComboBox txt_TenNL;
     private JTextField txt_NgayNhap;
+    private JTextField txt_NgayHetHan;
     private JFormattedTextField txt_SoLuong;
     private JTextField txt_DonVi;
     private JTextField txt_DonGia;
+    private JComboBox txt_MaNCC;
 
     private JDialog formPN_jDialog;
     
@@ -92,12 +98,12 @@ public class PhieuNhap {
     public JOptionPane suaPN_jOptionPane = new JOptionPane();
     private JOptionPane ThieuThongTin_jOptionPane = new JOptionPane();
     private JOptionPane Delete_Confirm_jOptionPane = new JOptionPane();
+    
     private Connection connection;
     
     public PhieuNhap(Connection connection){        
         this.connection = connection;
         init_pane();
-        btn_Dialog();
     }
     public void init_pane(){
         pane_bg = new JPanel();
@@ -133,8 +139,6 @@ public class PhieuNhap {
         pane_Search.setLayout(new FlowLayout(FlowLayout.CENTER, 9, 0)); 
         
         pane_search();
-//        pane_ThemPhieuNhap();
-        
         btn_Kho();
         btn_PhieuXuat();
         
@@ -173,7 +177,7 @@ public class PhieuNhap {
         pane_search_bar.add(txtSearch);
         pane_search_bar.add(btn_Search);
         
-        String colname_NL[] = {"MAPN", "MANL", "SL", "DONGIA", "NGAYNHAP", "GHICHU"};
+        String colname_NL[] = {"MAPN", "MANL", "SL", "DONGIA", "NGAYNHAP", "NGAYHETHAN", "GHICHU"};
         boxSearch = new JComboBox(colname_NL);
         boxSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boxSearch.setSelectedItem("TENNL");
@@ -209,7 +213,10 @@ public class PhieuNhap {
             public void actionPerformed(ActionEvent e){
                 System.out.println("Da bam tim kiem phieu nhap");
                 try{
-                    String sql = "SELECT * FROM PHIEUNHAP WHERE "+ boxSearch.getSelectedItem().toString() + " LIKE '%" + txtSearch.getText() + "%'";
+                    String sql = "SELECT MAPN, MANL, SL, DONGIA, "
+                    + "TO_CHAR(NGAYNHAP, 'DD-MM-YYYY') as NGAYNHAP, GHICHU, "
+                    + "TO_CHAR(NGAYHETHAN, 'DD-MM-YYYY') as NGAYHETHAN "
+                    + "FROM PHIEUNHAP WHERE "+ boxSearch.getSelectedItem().toString() + " LIKE '%" + txtSearch.getText() + "%'";
                     Statement statement = connection.createStatement();
                     ResultSet res = statement.executeQuery(sql);
                     
@@ -217,13 +224,15 @@ public class PhieuNhap {
                     tbmodel.setRowCount(0);
 
                     while(res.next()){
+                        String MAPN = res.getString("MAPN");
                         String MANL = res.getString("MANL");
-                        String TENNL = res.getString("TENNL");
+                        String SL = res.getString("SL");
                         String DONGIA = res.getString("DONGIA");
-                        String DONVI = res.getString("DONVI");
-                        String TONGSL = res.getString("TONGSL");
+                        String NGAYNHAP = res.getString("NGAYNHAP");
+                        String GHICHU = res.getString("GHICHU");
+                        String NGAYHETHAN = res.getString("NGAYHETHAN");
 
-                        Object tbdata[] = {MANL, TENNL, DONGIA, DONVI, TONGSL, null};
+                        Object tbdata[] = {MAPN, MANL, SL, DONGIA, NGAYNHAP, NGAYHETHAN, GHICHU, null};
                         tbmodel.addRow(tbdata);
                     }
                 }
@@ -241,19 +250,7 @@ public class PhieuNhap {
         formPN_jDialog.setPreferredSize(new Dimension(700, 500));
         formPN_jDialog.setModal(true);
         formPN_jDialog.setResizable(false);
-        formPN_jDialog.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0,20));
-    }
-    
-    public void btn_Dialog(){
-        btn_XacNhan = new ButtonGradient();
-        btn_XacNhan.setText("XÁC NHẬN");
-        btn_XacNhan.setColor1(new Color(225,244,255));
-        btn_XacNhan.setColor2(new Color(133,210,255));
-        
-        btn_cancel_themPN = new ButtonGradient();
-        btn_cancel_themPN.setText("HỦY");
-        btn_cancel_themPN.setColor1(new Color(255,231,231));
-        btn_cancel_themPN.setColor2(new Color(255,130,145));
+        formPN_jDialog.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0,10));
     }
     
     public void Dialog_form( boolean loaiDialog, int row){
@@ -267,6 +264,8 @@ public class PhieuNhap {
         JLabel SL = new JLabel("Số lượng:");
         JLabel DONGIA = new JLabel("Đơn giá:");
         JLabel NGAYNHAP = new JLabel("Ngày nhập:");
+        JLabel NGAYHETHAN = new JLabel("Ngày hết hạn:");
+        JLabel TENNCC = new JLabel("Mã nhà cung cấp:");
         JLabel GHICHU = new JLabel("Ghi chú:");
         
         NumberFormat format = NumberFormat.getInstance();
@@ -283,6 +282,7 @@ public class PhieuNhap {
         txt_MaNL = new JTextField(); 
         txt_DonVi = new JTextField();
         txt_DonGia = new JTextField();
+        txt_MaNCC = new JComboBox();
 
         ArrayList<String> StrTenNL = new ArrayList<String>(); 
         txt_TenNL = new JComboBox();
@@ -290,20 +290,26 @@ public class PhieuNhap {
         for (int i=0; i <arrTenNL.length; i++){
             txt_TenNL.addItem(arrTenNL[i]);
         }
-        setText_NL(txt_TenNL.getItemAt(txt_TenNL.getSelectedIndex()));
+        txt_TenNL.setSelectedIndex(1);
+        setText_NCC(txt_TenNL.getItemAt(txt_TenNL.getSelectedIndex()));
         txt_TenNL.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) { 
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Object item = e.getItem();
-                    setText_NL(item);
+                    setText_NCC(txt_TenNL.getItemAt(txt_TenNL.getSelectedIndex()));
                 }
             }
         });
         
         txt_NgayNhap = new JTextField();
         DateChooser NgayNhap_dateChooser = new DateChooser();
-        NgayNhap_dateChooser.setForeground(new java.awt.Color(255, 184, 183));
+        NgayNhap_dateChooser.setForeground(new java.awt.Color(167, 223, 255));
         NgayNhap_dateChooser.setTextRefernce(txt_NgayNhap);
+        
+        txt_NgayHetHan = new JTextField();
+        DateChooser NgayHetHan_dateChooser = new DateChooser();
+        NgayHetHan_dateChooser.setForeground(new java.awt.Color(255, 184, 183));
+        NgayHetHan_dateChooser.setTextRefernce(txt_NgayHetHan);
+        
         txt_SoLuong = new JFormattedTextField(formatter);
         String StrDonVi[] = { "Kg", "g", "Cái", "Lon", "Chai", "Lít", "ml"};
         
@@ -330,36 +336,54 @@ public class PhieuNhap {
         pane3.setLayout(new GridLayout(2, 2, 100, 3));
         pane3.setBackground(Color.white);        
         pane3.add(NGAYNHAP);
-        pane3.add(SL);
+        pane3.add(NGAYHETHAN);
         pane3.add(txt_NgayNhap);
-        pane3.add(txt_SoLuong);
+        pane3.add(txt_NgayHetHan);
         
         JPanel pane4 = new JPanel();
         pane4.setPreferredSize(new Dimension(600, 60));
         pane4.setLayout(new GridLayout(2, 2, 100, 3));
         pane4.setBackground(Color.white);  
-        pane4.add(DONVI);
-        pane4.add(DONGIA);
-        pane4.add(txt_DonVi);
-        pane4.add(txt_DonGia);
-
+        pane4.add(SL);
+        pane4.add(TENNCC);
+        pane4.add(txt_SoLuong);
+        pane4.add(txt_MaNCC);
+        
+        JPanel pane5 = new JPanel();
+        pane5.setPreferredSize(new Dimension(600, 60));
+        pane5.setLayout(new GridLayout(2, 2, 100, 3));
+        pane5.setBackground(Color.white);  
+        pane5.add(DONVI);
+        pane5.add(DONGIA);
+        pane5.add(txt_DonVi);
+        pane5.add(txt_DonGia);
 
         if(loai)
             setText_nextMAPN();
-//        else
-//            setText_currPN(row); //Lưu ý: sửa trong ngày!
+        else
+            setText_currPN(row); //Lưu ý: sửa trong ngày!
         
         formPN_jDialog.getContentPane().add(pane1);
         formPN_jDialog.getContentPane().add(pane2);
         formPN_jDialog.getContentPane().add(pane3);
         formPN_jDialog.getContentPane().add(pane4);
+        formPN_jDialog.getContentPane().add(pane5);
         
-               
         JPanel pane_btn_DialogPN = new JPanel();
         pane_btn_DialogPN.setLayout(new FlowLayout(FlowLayout.RIGHT, 15,0));
         pane_btn_DialogPN.setPreferredSize(new Dimension(500, 80));
         pane_btn_DialogPN.setBorder(new EmptyBorder(50, 0, 0, 0));
         pane_btn_DialogPN.setBackground(Color.white);
+        
+        btn_XacNhan = new ButtonGradient();
+        btn_XacNhan.setText("XÁC NHẬN");
+        btn_XacNhan.setColor1(new Color(225,244,255));
+        btn_XacNhan.setColor2(new Color(133,210,255));
+        
+        btn_cancel_themPN = new ButtonGradient();
+        btn_cancel_themPN.setText("HỦY");
+        btn_cancel_themPN.setColor1(new Color(255,231,231));
+        btn_cancel_themPN.setColor2(new Color(255,130,145));
         
         btn_cancel_themPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -372,8 +396,9 @@ public class PhieuNhap {
             public void actionPerformed(ActionEvent evt) {
                 if(loai)
                     themPN_jButtonActionPerformed(evt);
-//                else 
-//                    suaPN_jButtonActionPerformed(evt, row);
+                else
+                    suaPN_jButtonActionPerformed(evt, row);
+            
             }
         });
         pane_btn_DialogPN.add(btn_XacNhan);
@@ -385,16 +410,20 @@ public class PhieuNhap {
             String sql = "SELECT TENNL FROM KHONGUYENLIEU";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
-
+            boolean flag_Trung = false;
             while(res.next()){
                 String TENNL = res.getString("TENNL");
-                StrTenNL.add(TENNL);
+                for(int i=0; i<StrTenNL.size(); i++)
+                    if(StrTenNL.get(i).equals(TENNL)) 
+                        flag_Trung = true;
+                
+                if(!flag_Trung)
+                    StrTenNL.add(TENNL);
             }
         }
         catch(SQLException | HeadlessException ex){
             System.out.println("the error is"+ex);
         }
-        
         Object[] arr = StrTenNL.toArray();
         return arr;
     }
@@ -496,10 +525,10 @@ public class PhieuNhap {
     public void table_PN(){
         Scrollpane_TablePhieuNhap= new JScrollPane();
 
-        String[] columnNames = {"Mã phiếu nhập", "Mã nguyên liệu", "Số lượng", "Đơn giá", "Ngày nhập", "Ghi chú", ""};
+        String[] columnNames = {"Mã phiếu nhập", "Mã nguyên liệu", "Số lượng", "Đơn giá", "Ngày nhập", "Ngày hết hạn", "Ghi chú", ""};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, true
+                false, false, false, false, false, false, false, true
             };
             
             @Override
@@ -532,27 +561,26 @@ public class PhieuNhap {
         table_PhieuNhap.setBackground(Color.white);
         table_PhieuNhap.setBorder(new EmptyBorder(5, 5, 5,5));
         table_PhieuNhap.setFont(new Font("SansSerif", Font.PLAIN, 14));
-//        table_NV.setFont(new Font(table_NV.getFont().getName(),Font.PLAIN,14));
         
         TableColumnModel columnModel = table_PhieuNhap.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(100);
         columnModel.getColumn(1).setPreferredWidth(100);
         columnModel.getColumn(2).setPreferredWidth(100);
         columnModel.getColumn(3).setPreferredWidth(100);
-        columnModel.getColumn(4).setPreferredWidth(150);
+        columnModel.getColumn(4).setPreferredWidth(100);
         columnModel.getColumn(5).setPreferredWidth(100);
+        columnModel.getColumn(6).setPreferredWidth(100);
         
         add_data_table();
         
         table_PhieuNhap.setPreferredScrollableViewportSize(table_PhieuNhap.getPreferredSize());
         table_PhieuNhap.setFillsViewportHeight(true);
-//        table_NV.setSelectionBackground(new Color(56, 138, 112));
         
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
                 System.out.println("Edit row : " + row);
-//                SuaPhieuNhap_Dialog(row);
+                SuaPhieuNhap_Dialog(row);
             }
 
             @Override
@@ -561,30 +589,27 @@ public class PhieuNhap {
                     table_PhieuNhap.getCellEditor().stopCellEditing();
                 }
                 DefaultTableModel model = (DefaultTableModel) table_PhieuNhap.getModel();
-                Object value_MANV = model.getValueAt(row, 0);
-                System.out.println(value_MANV);
-                Object value_TENTK = model.getValueAt(row, 0);
-                System.out.println(value_TENTK);
+                Object value_MAPN = model.getValueAt(row, 0);
+                System.out.println(value_MAPN);
                 try {
                     Statement statement = connection.createStatement();
                     Delete_Confirm_jOptionPane.setVisible(true);
-//                    int flag_OK = Delete_Confirm_jOptionPane.showConfirmDialog(formNL_jDialog, "Bạn chắc chắn muốn xóa nguyên liệu?",null, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-//                    if(flag_OK == JOptionPane.OK_OPTION){
-////                        String sql = "DELETE FROM KHONGUYENLIEU WHERE MANL = '" + value_MANV + "'";
-////                        int res = statement.executeUpdate(sql);
-////                        System.out.println("Delete NV thanh cong");
-////                        sql = "DELETE FROM TAIKHOAN WHERE TENTK = '" + value_TENTK + "'";
-////                        res = statement.executeUpdate(sql);
-////                        System.out.println("Delete TK thanh cong");
-//                        model.removeRow(row);
-//                    }
+                    int flag_OK = Delete_Confirm_jOptionPane.showConfirmDialog(formPN_jDialog, "Bạn chắc chắn muốn xóa phiếu nhập?",null, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if(flag_OK == JOptionPane.OK_OPTION){
+                        String sql = "DELETE FROM PHIEUNHAP WHERE MAPN = '" + value_MAPN + "'";
+                        int res = statement.executeUpdate(sql);
+                        System.out.println("Delete PN thanh cong");
+                        model.removeRow(row);
+                    }
                 } catch (SQLException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
-        table_PhieuNhap.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender( new Color(255, 234, 234), new Color(255,244,248)));
-        table_PhieuNhap.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event, new Color(255, 234, 234), new Color(255,244,248)));
+//        table_PhieuNhap.prepareRenderer(new TableActionCellRender( new Color(255, 234, 234), new Color(255,244,248)), 0, 7);
+//        table_PhieuNhap.prepareEditor(new TableActionCellEditor(event, new Color(255, 234, 234), new Color(255,244,248)), 0, 7);
+        table_PhieuNhap.getColumnModel().getColumn(7).setCellRenderer(new TableActionCellRender( new Color(255, 234, 234), new Color(255,244,248)));
+        table_PhieuNhap.getColumnModel().getColumn(7).setCellEditor(new TableActionCellEditor(event, new Color(255, 234, 234), new Color(255,244,248)));
         
         Scrollpane_TablePhieuNhap.setViewportView(table_PhieuNhap);
         Scrollpane_TablePhieuNhap.setBorder(new LineBorder( Color.LIGHT_GRAY, 1, true));
@@ -595,7 +620,8 @@ public class PhieuNhap {
     public void add_data_table(){
         try{
             String sql = "SELECT MAPN, MANL, SL, DONGIA, "
-                    + "TO_CHAR(NGAYNHAP, 'DD-MM-YYYY') as NGAYNHAP, GHICHU "
+                    + "TO_CHAR(NGAYNHAP, 'DD-MM-YYYY') as NGAYNHAP, GHICHU, "
+                    + "TO_CHAR(NGAYHETHAN, 'DD-MM-YYYY') as NGAYHETHAN "
                     + "FROM PHIEUNHAP ORDER BY TO_NUMBER(SUBSTR( MAPN, 3 ))";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
@@ -607,8 +633,9 @@ public class PhieuNhap {
                 String DONGIA = res.getString("DONGIA");
                 String NGAYNHAP = res.getString("NGAYNHAP");
                 String GHICHU = res.getString("GHICHU");
-
-                Object tbdata[] = {MAPN, MANL, SL, DONGIA, NGAYNHAP, GHICHU, null};
+                String NGAYHETHAN = res.getString("NGAYHETHAN");
+                
+                Object tbdata[] = {MAPN, MANL, SL, DONGIA, NGAYNHAP, NGAYHETHAN, GHICHU, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_PhieuNhap.getModel();
                 tbmodel.addRow(tbdata);
             }
@@ -648,7 +675,6 @@ public class PhieuNhap {
                 txt_MaPN.setText(MAPN);
                 txt_MaPN.setForeground(new Color (134, 134, 134));
                 txt_MaPN.setEditable(false);
-                System.out.println("Set " + MAPN + " thanh cong" );
                 break;
             }
             if(!flag){
@@ -656,17 +682,17 @@ public class PhieuNhap {
                 txt_MaPN.setText(MAPN);
                 txt_MaPN.setForeground(new Color (134, 134, 134));
                 txt_MaPN.setEditable(false);
-                System.out.println("Set " + MAPN + " thanh cong" );
             }
         }
         catch(SQLException | HeadlessException ex){
             System.out.println("the error is "+ex);
         }
     }
-    private void setText_NL(Object TENNL){
+    
+    private void setText_NL(Object TENNL, Object MANCC){
         try {
             Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM KHONGUYENLIEU WHERE TENNL = '"+TENNL+"'";
+            String sql = "SELECT * FROM KHONGUYENLIEU WHERE TENNL = '"+TENNL+"' AND MANCC = '" + MANCC + "'";
             ResultSet res = statement.executeQuery(sql);
             while(res.next()){
                 String MANL = res.getString("MANL");
@@ -683,12 +709,40 @@ public class PhieuNhap {
                 txt_DonGia.setText(DONGIA);
                 txt_DonGia.setForeground(new Color (134, 134, 134));
                 txt_DonGia.setEditable(false);
-                break;
+    
             }
         }
         catch(SQLException | HeadlessException ex){
             System.out.println("the error is "+ex);
         }
+    }    
+    
+    private void setText_NCC(Object TENNL){
+        ArrayList<String> StrMaNCC = new ArrayList<String>();
+        txt_MaNCC.removeAllItems();
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "SELECT MANCC FROM KHONGUYENLIEU WHERE TENNL = '"+TENNL.toString()+"'";
+            ResultSet res = statement.executeQuery(sql);
+            while(res.next()){
+                String MANCC = res.getString("MANCC");
+                StrMaNCC.add(MANCC);
+            }
+        }
+        catch(SQLException | HeadlessException ex){
+            System.out.println("the error is "+ex);
+        }
+        
+        Object[] arrMaNCC = StrMaNCC.toArray();
+        for (int i=0; i <arrMaNCC.length; i++)
+            txt_MaNCC.addItem(arrMaNCC[i]);
+        setText_NL(txt_TenNL.getItemAt(txt_TenNL.getSelectedIndex()), txt_MaNCC.getItemAt(txt_MaNCC.getSelectedIndex()));        
+        txt_MaNCC.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) { 
+                if (e.getStateChange() == ItemEvent.SELECTED) 
+                    setText_NL(txt_TenNL.getItemAt(txt_TenNL.getSelectedIndex()), txt_MaNCC.getItemAt(txt_MaNCC.getSelectedIndex()));
+            }
+        }); 
     }
     private void ThemPhieuNhap_Dialog(ActionEvent evt) {
         Dialog_form(true, -1);
@@ -702,9 +756,11 @@ public class PhieuNhap {
     public void themPN_jButtonActionPerformed(ActionEvent evt){
         String MaPN = txt_MaPN.getText();            
         String MaNL = txt_MaNL.getText();
+        Object MaNCC = txt_MaNCC.getItemAt(txt_MaNCC.getSelectedIndex());      
         Object SoLuong = txt_SoLuong.getValue();
         String DonGia = txt_DonGia.getText();
         String NgayNhap = txt_NgayNhap.getText();
+        String NgayHetHan = txt_NgayHetHan.getText();
         Object GhiChu = txt_GhiChu.getItemAt(txt_GhiChu.getSelectedIndex());
              
         try {
@@ -714,7 +770,7 @@ public class PhieuNhap {
                 ThieuThongTin_jOptionPane.showMessageDialog(formPN_jDialog, "Vui lòng nhập đầy đủ thông tin!");
                 ThieuThongTin_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
             } else {
-                String sql = "INSERT INTO PHIEUNHAP VALUES (  '" + MaPN + "' , '" + MaNL + "', " + SoLuong + ", " + DonGia + ", TO_DATE('" + NgayNhap + "', 'DD-MM-YYYY'), '" + GhiChu + "' )";
+                String sql = "INSERT INTO PHIEUNHAP VALUES (  '" + MaPN + "' , '" + MaNL + "', " + SoLuong + ", " + DonGia + ", TO_DATE('" + NgayNhap + "', 'DD-MM-YYYY'), '" + GhiChu + "', TO_DATE('" + NgayHetHan + "', 'DD-MM-YYYY') )";
                 int res = statement.executeUpdate(sql);
                 System.out.println("Insert thanh cong");
                 themPN_jOptionPane.setVisible(true);
@@ -731,14 +787,107 @@ public class PhieuNhap {
             ResultSet res = statement.executeQuery(sql);
 
             while(res.next()){
-                Object tbdata[] = {MaPN, MaNL, SoLuong, DonGia, NgayNhap, GhiChu, null};
+                Object tbdata[] = {MaPN, MaNL, SoLuong, DonGia, NgayNhap, NgayHetHan, GhiChu, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_PhieuNhap.getModel();
                 tbmodel.addRow(tbdata);
                 break;
             }
         }
         catch(SQLException | HeadlessException ex){
-                    System.out.println("the error is "+ex);
+            System.out.println("the error is "+ex);
         }
+    }
+    
+    private void SuaPhieuNhap_Dialog(int row) {
+        Dialog_form(false, row);
+        formPN_jDialog.pack();
+        formPN_jDialog.setLocationRelativeTo(null);
+        formPN_jDialog.setVisible(true);
+    }
+    
+    private void setText_currPN(int row){
+        DefaultTableModel model = (DefaultTableModel) table_PhieuNhap.getModel();
+        Object value_MAPN = model.getValueAt(row, 0);
+        System.out.println(value_MAPN);
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "SELECT MAPN, MANL, SL, DONGIA, "
+                    + "TO_CHAR(NGAYNHAP, 'DD-MM-YYYY') as NGAYNHAP, GHICHU, "
+                    + "TO_CHAR(NGAYHETHAN, 'DD-MM-YYYY') as NGAYHETHAN "
+                    + "FROM PHIEUNHAP WHERE MAPN = '" + value_MAPN + "'";
+            ResultSet res = statement.executeQuery(sql);
+            System.out.println(value_MAPN + " thanh cong");
+
+            while (res.next()) {
+                String MaPN = res.getString("MAPN");
+                String MaNL = res.getString("MANL");
+                String SoLuong = res.getString("SL");
+                String DonGia = res.getString("DONGIA");
+                String NgayNhap = res.getString("NGAYNHAP");
+                String GhiChu = res.getString("GHICHU");
+                String NgayHetHan = res.getString("NGAYHETHAN");
+
+                txt_MaPN.setText(MaPN);
+                txt_MaPN.setForeground(new Color(134, 134, 134));
+                txt_MaPN.setEditable(false);
+                
+                txt_MaNL.setText(MaNL);
+                txt_MaNL.setForeground(new Color(134, 134, 134));
+                txt_MaNL.setEditable(false);
+                
+                txt_SoLuong.setText(SoLuong);
+                txt_DonGia.setText(DonGia);
+                txt_NgayNhap.setText(NgayNhap);
+                txt_NgayHetHan.setText(NgayHetHan);
+                txt_GhiChu.setSelectedItem(GhiChu);
+                try {
+                    Statement statement1 = connection.createStatement();
+                    String sql1 = "SELECT * FROM KHONGUYENLIEU WHERE MANL = '" + MaNL + "'";
+                    ResultSet res1 = statement1.executeQuery(sql1);
+                    while (res1.next()) {
+                        String TenNL = res1.getString("TENNL");
+                        String MaNCC = res1.getString("MANCC");
+                        txt_TenNL.setSelectedItem(TenNL);
+                        txt_MaNCC.setSelectedItem(MaNCC);
+                        setText_NCC(TenNL);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void suaPN_jButtonActionPerformed(ActionEvent evt, int row){
+        DefaultTableModel model = (DefaultTableModel) table_PhieuNhap.getModel();
+        String MaPN = txt_MaPN.getText();
+        String MaNL = txt_MaNL.getText();
+        Object MaNCC = txt_MaNCC.getItemAt(txt_MaNCC.getSelectedIndex());
+        Object SoLuong = txt_SoLuong.getValue();
+        String DonGia = txt_DonGia.getText();
+        String NgayNhap = txt_NgayNhap.getText();
+        String NgayHetHan = txt_NgayHetHan.getText();
+        Object GhiChu = txt_GhiChu.getItemAt(txt_GhiChu.getSelectedIndex());
+        
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "UPDATE PHIEUNHAP SET MANL = '"+MaNL+"', SL = '" +SoLuong+ "', DONGIA = '" +DonGia+ "', NGAYNHAP = TO_DATE('"+NgayNhap+"', 'DD-MM-YYYY'), GHICHU = '" +GhiChu+ "', NGAYHETHAN = TO_DATE('"+NgayHetHan+"', 'DD-MM-YYYY') WHERE MAPN = '" + MaPN + "'";
+            int res = statement.executeUpdate(sql); 
+            suaPN_jOptionPane.setVisible(true);
+            suaPN_jOptionPane.showMessageDialog(formPN_jDialog, "Cập nhật phiếu nhập thành công!");
+            formPN_jDialog.setVisible(false);
+            System.out.println("Update PN thanh cong");
+            
+            model.setValueAt(MaNL, row, 1);
+            model.setValueAt(SoLuong, row, 2);
+            model.setValueAt(DonGia, row, 3);
+            model.setValueAt(NgayNhap, row, 4);
+            model.setValueAt(NgayHetHan, row, 5);
+            model.setValueAt(GhiChu, row, 6);
+        } catch (SQLException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }    
     }
 }

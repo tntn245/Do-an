@@ -21,6 +21,7 @@ import java.awt.Insets;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -87,9 +88,10 @@ public class QuanlyNhanVien {
     private JComboBox txt_GioiTinh;
     private JTextField txt_Email;
     private JTextField txt_NgaySinh;
-    private JTextField txt_ChucVu;
+    private JComboBox txt_ChucVu;
     private JTextField txt_NgayVaoLam;
     private JFormattedTextField txt_Luong;
+    private JComboBox txt_TinhTrang;
     private JTextField txt_DiaChi;
 
     private JOptionPane ThieuThongTin_jOptionPane = new JOptionPane();
@@ -237,7 +239,7 @@ public class QuanlyNhanVien {
     public void init_Dialog(){
         formNV_jDialog = new JDialog();
         formNV_jDialog.getContentPane().setBackground(new Color(255, 255, 255));
-        formNV_jDialog.setMinimumSize(new Dimension(700, 500));
+        formNV_jDialog.setMinimumSize(new Dimension(800, 500));
         formNV_jDialog.setModal(true);
         formNV_jDialog.setResizable(false);
         GridBagLayout jDialogLayout = new GridBagLayout();
@@ -263,6 +265,7 @@ public class QuanlyNhanVien {
         JLabel NgayVaoLam = new JLabel("Ngày vào làm:");
         JLabel Luong = new JLabel("Lương:");
         JLabel DiaChi = new JLabel("Địa chỉ:");
+        JLabel TinhTrang = new JLabel("Tình trạng làm việc:");
         
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
@@ -294,17 +297,33 @@ public class QuanlyNhanVien {
         String StrGioiTinh[] = {"Nam", "Nữ"};
         txt_GioiTinh = new JComboBox(StrGioiTinh);
         txt_Email = new JTextField();
+        txt_Email.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (!txt_Email.getText().endsWith("@gmail.com")) {
+                    txt_Email.setText(txt_Email.getText() + "@gmail.com");
+                }
+            }
+        });
+        txt_Email.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                email_JTextFieldFocusLost(evt);
+            }
+        });
         txt_NgaySinh = new JTextField();
         DateChooser ngaySinh_dateChooser = new DateChooser();
         ngaySinh_dateChooser.setForeground(new java.awt.Color(167, 223, 255));
         ngaySinh_dateChooser.setTextRefernce(txt_NgaySinh);
-        txt_ChucVu = new JTextField();
+        String StrChucVu[] = {"Quản lý", "Thu ngân", "Nhân viên kho", "Nhân viên bếp"};
+        txt_ChucVu = new JComboBox(StrChucVu);
         txt_NgayVaoLam = new JTextField();
         DateChooser ngayVaoLam_dateChooser = new DateChooser();
         ngayVaoLam_dateChooser.setForeground(new java.awt.Color(255, 184, 183));
         ngayVaoLam_dateChooser.setTextRefernce(txt_NgayVaoLam);
         txt_Luong = new JFormattedTextField(formatter);
         txt_DiaChi = new JTextField();
+        String StrTinhTrang[] = {"Đang làm việc", "Đã nghỉ việc"};
+        txt_TinhTrang = new JComboBox(StrTinhTrang);
         
         ButtonGradient btn_cancel_themNV = new ButtonGradient();
         btn_cancel_themNV.setText("HỦY");
@@ -418,12 +437,20 @@ public class QuanlyNhanVien {
         gbc.gridy = 12;
         gbc.gridwidth = 5;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        formNV_jDialog.getContentPane().add(TinhTrang, gbc);
+        
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 56;
+        gbc.gridy = 12;
+        gbc.gridwidth = 5;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         formNV_jDialog.getContentPane().add(DiaChi, gbc);
         
         if(loai)
             setText_nextMANV();
         else
             setText_currMANV(row);
+        
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -432,11 +459,6 @@ public class QuanlyNhanVien {
         gbc.insets = new Insets(10, 0, 30, 0);
         formNV_jDialog.getContentPane().add(txt_IDNhanVien, gbc);
 
-        txt_HoTen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                hoTen_jTextFieldActionPerformed(evt);
-            }
-        });
         gbc = new GridBagConstraints();
         gbc.gridx = 56;
         gbc.gridy = 2;
@@ -518,10 +540,18 @@ public class QuanlyNhanVien {
         gbc = new GridBagConstraints();
         gbc.gridx = 26;
         gbc.gridy = 14;
-        gbc.gridwidth = 49;
+        gbc.gridwidth = 25;
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(10, 0, 30, 0);
-        formNV_jDialog.getContentPane().add(txt_DiaChi, gbc);    
+        formNV_jDialog.getContentPane().add(txt_TinhTrang, gbc);    
+        
+        gbc = new GridBagConstraints();
+        gbc.gridx = 56;
+        gbc.gridy = 14;
+        gbc.gridwidth = 19;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.insets = new java.awt.Insets(10, 0, 30, 0);
+        formNV_jDialog.getContentPane().add(txt_DiaChi, gbc);   
     }
 
     public void btn_ThemNV(){
@@ -670,12 +700,18 @@ public class QuanlyNhanVien {
         }
     }
     
+    private void email_JTextFieldFocusLost(java.awt.event.FocusEvent evt) {
+        if (!txt_Email.getText().endsWith("@gmail.com")) {
+            txt_Email.setText(txt_Email.getText() + "@gmail.com");
+        }
+    }
+    
     public void add_data_table(){
         try{
             String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
                     + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
                     + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
-                    + "CHUCVU, LUONG, TENTK "
+                    + "CHUCVU, LUONG, TINHTRANGLAMVIEC, TENTK "
                     + "FROM NHANVIEN ORDER BY TO_NUMBER(SUBSTR( MANV, 3 ))";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
@@ -741,13 +777,14 @@ public class QuanlyNhanVien {
         Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
         String Email = txt_Email.getText();
         String NgSinh = txt_NgaySinh.getText();
-        String ChucVu = txt_ChucVu.getText();
+        Object ChucVu = txt_ChucVu.getItemAt(txt_ChucVu.getSelectedIndex());
         String NVL = txt_NgayVaoLam.getText();
         Object Luong = txt_Luong.getValue();
+        Object TinhTrang = txt_TinhTrang.getItemAt(txt_TinhTrang.getSelectedIndex());
                     
         try {
             Statement statement = connection.createStatement();
-            if (HoTen.equals("") || CCCD.equals("") || DiaChi.equals("") || SDT.equals("") || GioiTinh.equals("") || Email.equals("") || NgSinh.equals("") || ChucVu.equals("") || NVL.equals("") || Luong.equals("")) {
+            if (HoTen.equals("") || CCCD.equals("") || DiaChi.equals("") || SDT.equals("") || Email.equals("") || Luong.equals("")) {
                 ThieuThongTin_jOptionPane.setVisible(true);
                 ThieuThongTin_jOptionPane.showMessageDialog(formNV_jDialog, "Vui lòng nhập đầy đủ thông tin!");
                 ThieuThongTin_jOptionPane.setMessageType(JOptionPane.WARNING_MESSAGE);
@@ -763,7 +800,7 @@ public class QuanlyNhanVien {
                     CCCDTontai_jOptionPane.showMessageDialog(formNV_jDialog, "CMND/CCCD đã tồn tại!");
                     CCCDTontai_jOptionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
                 } else {
-                    sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '" + SDT + "' , '" + Email + "' , '" + GioiTinh + "' , TO_DATE('" + NgSinh + "', 'DD-MM-YYYY'), TO_DATE('" + NVL + "', 'DD-MM-YYYY'), '" + ChucVu + "' , '" + Luong + "', '' )";
+                    sql = "INSERT INTO NHANVIEN VALUES (  '" + MaNV + "' , '" + HoTen + "', '" + CCCD + "', '" + DiaChi + "', '" + SDT + "' , '" + Email + "' , '" + GioiTinh + "' , TO_DATE('" + NgSinh + "', 'DD-MM-YYYY'), TO_DATE('" + NVL + "', 'DD-MM-YYYY'), '" + ChucVu + "' , '" + Luong + "', '" + TinhTrang +"', null )";
                     int res = statement.executeUpdate(sql);
                     System.out.println("Insert thanh cong");
                     themNV_jOptionPane.setVisible(true);
@@ -780,7 +817,7 @@ public class QuanlyNhanVien {
             String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
                     + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
                     + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
-                    + "CHUCVU, LUONG, TENTK "
+                    + "CHUCVU, LUONG, TINHTRANGLAMVIEC, TENTK "
                     + "FROM NHANVIEN WHERE MANV = '" + MaNV +"'";
             Statement statement = connection.createStatement();
             ResultSet res = statement.executeQuery(sql);
@@ -793,7 +830,6 @@ public class QuanlyNhanVien {
                 ChucVu = res.getString("CHUCVU");
                 Luong = res.getObject("LUONG");
                 String TENTK = res.getString("TENTK");
-
                 
                 Object tbdata[] = {MaNV, HoTen, GioiTinh, NVL, ChucVu, Luong, TENTK, null};
                 DefaultTableModel tbmodel = (DefaultTableModel)table_NV.getModel();
@@ -821,7 +857,7 @@ public class QuanlyNhanVien {
             String sql = "SELECT MANV, HOTEN, CCCD, DIACHI, SDT, EMAIL, GIOITINH, "
                     + "TO_CHAR(NGSINH, 'DD-MM-YYYY') as NGSINH, "
                     + "TO_CHAR(NGVL, 'DD-MM-YYYY') as NGVL, "
-                    + "CHUCVU, LUONG, TENTK "
+                    + "CHUCVU, LUONG, TINHTRANGLAMVIEC, TENTK "
                     + "FROM NHANVIEN WHERE MANV = '" + value_MANV + "'";
             ResultSet res = statement.executeQuery(sql);
             System.out.println(value_MANV + " thanh cong");
@@ -843,6 +879,7 @@ public class QuanlyNhanVien {
                     Luong = 0;
                 else 
                     Luong = Integer.parseInt(StrLuong);
+                String TinhTrang = res.getString("TINHTRANGLAMVIEC");
                 String TENTK = res.getString("TENTK");
 
                 txt_IDNhanVien.setText(MaNV);
@@ -854,14 +891,14 @@ public class QuanlyNhanVien {
                 txt_DiaChi.setText(DiaChi);
                 txt_SDT.setText(SDT);
                 txt_Email.setText(Email);
-
-                if (GioiTinh == "Nam")
+                if (GioiTinh.equals("Nam") )
                     txt_GioiTinh.setSelectedIndex(0);
                 else
                     txt_GioiTinh.setSelectedIndex(1);
                 txt_NgaySinh.setText(NgSinh);
                 txt_NgayVaoLam.setText(NgVL);
-                txt_ChucVu.setText(ChucVu);
+                txt_ChucVu.setSelectedItem(ChucVu);
+                txt_TinhTrang.setSelectedItem(TinhTrang);
                 txt_Luong.setValue(Luong);
             }
         } catch (SQLException ex) {
@@ -880,11 +917,12 @@ public class QuanlyNhanVien {
         Object GioiTinh = txt_GioiTinh.getItemAt(txt_GioiTinh.getSelectedIndex());
         String NgSinh = txt_NgaySinh.getText();
         String NVL = txt_NgayVaoLam.getText();
-        String ChucVu = txt_ChucVu.getText();
+        Object ChucVu = txt_ChucVu.getItemAt(txt_ChucVu.getSelectedIndex());
+        Object TinhTrang = txt_TinhTrang.getItemAt(txt_TinhTrang.getSelectedIndex());
         Object Luong = txt_Luong.getValue();
         try {
             Statement statement = connection.createStatement();
-            String sql = "UPDATE NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = TO_DATE('"+NgSinh+"', 'DD-MM-YYYY'), NGVL = TO_DATE('"+NVL+"', 'DD-MM-YYYY'), CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", TENTK = '' WHERE MANV = '" + MaNV + "'";
+            String sql = "UPDATE NHANVIEN SET HOTEN = '"+HoTen+"', CCCD = '" +CCCD+ "', DIACHI = '" +DiaChi+ "', SDT = '"+SDT+"', EMAIL = '"+Email+"', GIOITINH = '"+GioiTinh+"', NGSINH = TO_DATE('"+NgSinh+"', 'DD-MM-YYYY'), NGVL = TO_DATE('"+NVL+"', 'DD-MM-YYYY'), CHUCVU = '"+ChucVu+"', LUONG = "+Luong+", TINHTRANGLAMVIEC = '"+ TinhTrang+"', TENTK = '' WHERE MANV = '" + MaNV + "'";
             int res = statement.executeUpdate(sql); 
             suaNV_jOptionPane.setVisible(true);
             suaNV_jOptionPane.showMessageDialog(formNV_jDialog, "Cập nhật nhân viên thành công!");

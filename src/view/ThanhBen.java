@@ -36,6 +36,7 @@ public class ThanhBen {
     public JButton btn_HoaDon;
     public JButton btn_ThucDon;
     public JButton btn_Kho;
+    public JButton btn_NCC;
     public JButton btn_ThongKe;
 
     public ThanhBen(){
@@ -48,9 +49,9 @@ public class ThanhBen {
         pane_gradient.setPreferredSize(new Dimension(100, 600));  
         pane_gradient.setLayout(new java.awt.GridLayout(6, 1));
         btn_NhanVien();
-//        btn_KhachHang();
         btn_HoaDon();
         btn_ThucDon();
+        btn_NCC();
         btn_Kho();
         btn_ThongKe();
     }
@@ -154,6 +155,37 @@ public class ThanhBen {
         pane_gradient.add(btn_ThucDon);
     }
     
+    public void btn_NCC(){
+        btn_NCC = new JButton ("NHÀ CUNG CẤP");
+        btn_NCC.setOpaque(false);
+        btn_NCC.setContentAreaFilled(false);
+        btn_NCC.setFocusPainted(false);
+        btn_NCC.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        Font newButtonFont=new Font(btn_NCC.getFont().getName(),Font.BOLD,btn_NCC.getFont().getSize());
+        btn_NCC.setFont(newButtonFont);
+        btn_NCC.setToolTipText("Hiển thị trang quản lý nhà cung cấp");
+        btn_NCC.setBorder(null);
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/image/wholesale.png"));
+        Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(image); 
+        btn_NCC.setIcon(newIcon);
+        
+        btn_NCC.setVerticalTextPosition(SwingConstants.BOTTOM);
+        btn_NCC.setHorizontalTextPosition(SwingConstants.CENTER);
+        
+        btn_NCC.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                NCC_jButtonMouseEntered(e);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                NCC_jButtonMouseExited(e);
+            }
+        });
+        pane_gradient.add(btn_NCC);
+    }
 
     public void btn_Kho(){
         btn_Kho = new JButton ("KHO");
@@ -253,6 +285,15 @@ public class ThanhBen {
 
     private void kho_jButtonMouseExited(java.awt.event.MouseEvent evt) {
         btn_Kho.setContentAreaFilled(false);
+    }
+    
+    private void NCC_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
+        btn_NCC.setContentAreaFilled(true);
+        btn_NCC.setBackground(Color.GRAY);
+    }
+
+    private void NCC_jButtonMouseExited(java.awt.event.MouseEvent evt) {
+        btn_NCC.setContentAreaFilled(false);
     }
     
     private void thongke_jButtonMouseEntered(java.awt.event.MouseEvent evt) {
